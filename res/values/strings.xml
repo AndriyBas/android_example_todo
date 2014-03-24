@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ToDoExample</string>
+    <string name="menu_main_insert">Insert</string>
+    <string name="todo_list_empty">No current ToDos</string>
+    <string name="todo_edit_summary">ToDo summary</string>
+    <string name="todo_edit_description">ToDo description</string>
+    <string name="menu_todo_detail_delete">Delete</string>
+    <string name="menu_todo_save">Save</string>
+</resources>
