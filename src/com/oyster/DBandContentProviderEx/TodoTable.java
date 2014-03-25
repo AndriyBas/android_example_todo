@@ -20,7 +20,7 @@ public class TodoTable {
             COLUMN_ID,
             COLUMN_SUMMARY,
             COLUMN_DESCRIPTION,
-            COLUMN_ID
+            COLUMN_CATEGORY
     };
 
     public static final String CREATE_TABLE = "create table " +

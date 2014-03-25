@@ -27,8 +27,6 @@
 
         </activity>
 
-        <activity android:name=".TodoDetailActivity"/>
-
         <provider
                 android:authorities="com.oyster.DBandContentProviderEx"
                 android:name=".TodoContentProvider"

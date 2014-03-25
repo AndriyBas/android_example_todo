@@ -5,14 +5,14 @@
         >
     <item
             android:id="@+id/menu_todo_detail_delete"
-            android:showAsAction="always"
+            android:showAsAction="ifRoom|withText"
             android:title="@string/menu_todo_detail_delete"
             android:icon="@android:drawable/ic_menu_delete"
             />
 
     <item
             android:id="@+id/menu_todo_detail_save"
-            android:showAsAction="always"
+            android:showAsAction="ifRoom|withText"
             android:title="@string/menu_todo_save"
             android:icon="@android:drawable/ic_menu_save"
             />

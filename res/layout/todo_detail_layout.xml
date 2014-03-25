@@ -11,15 +11,30 @@
     <LinearLayout
             android:id="@+id/LinearLayout01"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
 
         <EditText
                 android:id="@+id/todo_edit_summary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
                 android:hint="@string/todo_edit_summary"
-                android:imeOptions="actionNext" >
+                android:imeOptions="actionNext"
+                android:textSize="30dp"
+                android:layout_weight="2"
+                >
         </EditText>
+
+        <Spinner
+                android:id="@+id/todo_edit_category"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                >
+
+
+        </Spinner>
     </LinearLayout>
 
     <EditText
@@ -30,13 +45,9 @@
             android:gravity="top"
             android:hint="@string/todo_edit_description"
             android:imeOptions="actionNext"
-
+            android:textSize="25dp"
             >
     </EditText>
-
-
-
-
 
 
 </LinearLayout>

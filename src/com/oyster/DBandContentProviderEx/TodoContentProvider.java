@@ -114,7 +114,7 @@ public class TodoContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-        return Uri.parse(BASE_PATH + "/" + id);
+        return Uri.parse(CONTENT_URI + "/" + id);
     }
 
     @Override
