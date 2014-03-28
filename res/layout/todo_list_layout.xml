@@ -14,14 +14,16 @@
             android:layout_height="wrap_content">
 
     </ListView>
+    <!--
 
-    <TextView
-            android:id="@android:id/empty"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="20dp"
-            android:text="@string/todo_list_empty"
-            android:gravity="center"
-            />
+        <TextView
+                android:id="@android:id/empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="20dp"
+                android:text="@string/todo_list_empty"
+                android:gravity="center"
+                />
+    -->
 
 </LinearLayout>

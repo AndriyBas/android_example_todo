@@ -6,7 +6,7 @@ package com.oyster.DBandContentProviderEx;
  */
 public class ToDo {
 
-    private int mID = -1;
+    private String mID = "-1";
 
     private String mSummary;
 
@@ -23,16 +23,16 @@ public class ToDo {
         mCategory = category;
     }
 
-    public ToDo(int id, String summary, String description, Category category) {
+    public ToDo(String id, String summary, String description, Category category) {
         this(summary, description, category);
         mID = id;
     }
 
-    public int getID() {
+    public String getID() {
         return mID;
     }
 
-    public void setID(int ID) {
+    public void setID(String ID) {
         mID = ID;
     }
 

@@ -7,4 +7,7 @@
     <string name="todo_edit_description">ToDo description</string>
     <string name="menu_todo_detail_delete">Delete</string>
     <string name="menu_todo_save">Save</string>
+    <string name="action_bar_title_detail_fragment">ToDo Details</string>
+    <string name="action_bar_title_main_fragment">ToDo List</string>
+    <string name="context_menu_delete">Delete</string>
 </resources>

@@ -13,7 +13,7 @@
     <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/todo_imageView"
+            android:id="@+id/todo_row_imageView"
             android:src="@android:drawable/star_big_on"
             android:padding="2dp"
             android:layout_marginLeft="10dp"
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="New Text"
-            android:id="@+id/row_textView"
+            android:id="@+id/todo_row_textView"
             android:textSize="30dp"
             android:gravity="center_vertical"
             />
