@@ -30,4 +30,6 @@ proguard/
 proguard-project.txt
 
 
+
 *~
+*.properties
