@@ -25,7 +25,6 @@ import java.util.ArrayList;
 public class ToDoDetailFragment extends Fragment {
 
 
-
     private ToDo toDo;
 
     private EditText mEditTextSummary;
@@ -211,6 +210,8 @@ public class ToDoDetailFragment extends Fragment {
             }
         });
 
+        mToDoChanged = false;
+
         return 1;
     }
 
@@ -257,6 +258,7 @@ public class ToDoDetailFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
+                mToDoChanged = false;
                 Toast.makeText(getActivity(), "ToDo was not saved ...", Toast.LENGTH_SHORT);
 //                mOnSuicideListener.onFragmentSuicide();
                 getActivity().onBackPressed();

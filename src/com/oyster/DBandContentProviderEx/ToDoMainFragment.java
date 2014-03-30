@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -37,6 +38,14 @@ public class ToDoMainFragment extends ListFragment {
 
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+        mToDoParseAdapter = new ToDoParseAdapter(getActivity());
+
+//        mToDoParseAdapter.loadObjects();
+//        mToDoParseAdapter.setAutoload(false);
+//        mToDoParseAdapter.setPaginationEnabled(false);
+
+        setListAdapter(mToDoParseAdapter);
 
 //        registerForContextMenu(getListView());
 //        registerForContextMenu(getListView());
@@ -169,6 +178,16 @@ public class ToDoMainFragment extends ListFragment {
 
                 createToDo(null);
                 return true;
+            case R.id.menu_main_logOut:
+
+                ParseUser.logOut();
+                Intent i = new Intent(getActivity(), LogInOrSignUpActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(i);
+                getActivity().finish();
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -202,13 +221,7 @@ public class ToDoMainFragment extends ListFragment {
 
     private void fillData() {
 
-        mToDoParseAdapter = new ToDoParseAdapter(getActivity());
 
-//        mToDoParseAdapter.loadObjects();
-//        mToDoParseAdapter.setAutoload(false);
-//        mToDoParseAdapter.setPaginationEnabled(false);
-
-        setListAdapter(mToDoParseAdapter);
     }
 
 
@@ -283,6 +296,7 @@ public class ToDoMainFragment extends ListFragment {
             parseQuery.whereEqualTo(ToDo.KEY_USER, ParseUser.getCurrentUser());
             parseQuery.include("user");
             parseQuery.orderByDescending("createdAt");
+            parseQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
             return parseQuery;
         }
