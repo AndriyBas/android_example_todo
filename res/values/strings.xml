@@ -15,4 +15,10 @@
     <string name="navigation_drawer_action_bar_open_drawer">Drawer opened</string>
     <string name="navigation_drawer_action_bar_close_drawer">App name</string>
     <string name="hello_world">Hello Now Card</string>
+    <string name="prompt_username">username</string>
+    <string name="prompt_password">password</string>
+    <string name="action_register__short">Sign Up</string>
+    <string name="action_sign_in_short">Log In</string>
+    <string name="prompt_full_name">full name</string>
+    <string name="prompt_email">email</string>
 </resources>

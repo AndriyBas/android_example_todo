@@ -1,62 +1,65 @@
 package com.oyster.DBandContentProviderEx;
 
+import com.parse.ParseClassName;
+import com.parse.ParseObject;
+
 /**
  * @author bamboo
  * @since 3/24/14 5:42 PM
  */
-public class ToDo {
 
-    private String mID = "-1";
+@ParseClassName("ToDo")
+public class ToDo extends ParseObject {
 
-    private String mSummary;
-
-    private String mDescription;
-
-    private Category mCategory;
+    public static final String KEY_ID = "_id";
+    public static final String KEY_SUMMARY = "summary";
+    public static final String KEY_DESCRIPTION = "description";
+    public static final String KEY_CATEGORY = "category";
 
     private ToDo() {
     }
 
     public ToDo(String summary, String description, Category category) {
-        mSummary = summary;
-        mDescription = description;
-        mCategory = category;
+        setSummary(summary);
+        setDescription(description);
+        setCategory(category);
     }
+
 
     public ToDo(String id, String summary, String description, Category category) {
         this(summary, description, category);
-        mID = id;
+        setID(id);
     }
 
     public String getID() {
-        return mID;
+        return getString(KEY_ID);
     }
 
     public void setID(String ID) {
-        mID = ID;
+        put(KEY_ID, ID);
     }
 
     public String getSummary() {
-        return mSummary;
+        return getString(KEY_SUMMARY);
     }
 
     public void setSummary(String summary) {
-        mSummary = summary;
+        put(KEY_SUMMARY, summary);
     }
 
     public String getDescription() {
-        return mDescription;
+        return getString(KEY_DESCRIPTION);
     }
 
     public void setDescription(String description) {
-        mDescription = description;
+        put(KEY_DESCRIPTION, description);
     }
 
     public Category getCategory() {
-        return mCategory;
+        return Category.valueOf(getString(KEY_CATEGORY));
     }
 
     public void setCategory(Category category) {
-        mCategory = category;
+        put(KEY_CATEGORY, category.toString());
     }
 }
