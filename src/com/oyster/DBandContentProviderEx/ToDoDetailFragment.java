@@ -2,20 +2,19 @@ package com.oyster.DBandContentProviderEx;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import com.parse.*;
 
 import java.util.ArrayList;
 
@@ -25,18 +24,17 @@ import java.util.ArrayList;
  */
 public class ToDoDetailFragment extends Fragment {
 
-    private ToDo todo;
 
-    private Uri todoUri;
+
+    private ToDo toDo;
 
     private EditText mEditTextSummary;
     private EditText mEditTextDescription;
     private Spinner mSpinnerCategory;
+
     private ArrayList<String> categories;
 
-    private static final String KEY_TODO_URI = "com.oyster.todo_uri";
-
-//    private OnSuicideListener mOnSuicideListener;
+    private static final String KEY_TODO = "com.oyster.todo";
 
     TextWatcher mTextWatcher = new TextWatcher() {
         @Override
@@ -55,14 +53,13 @@ public class ToDoDetailFragment extends Fragment {
 
     private Boolean mToDoChanged = false;
 
-    public static ToDoDetailFragment newInstance(Uri uri, OnSuicideListener listener) {
+    public static ToDoDetailFragment newInstance(ToDo toDo) {
 
         ToDoDetailFragment fragment = new ToDoDetailFragment();
-//        fragment.setOnSuicideListener(listener);
 
-        if (uri != null) {
+        if (toDo != null) {
             Bundle args = new Bundle();
-            args.putParcelable(KEY_TODO_URI, uri);
+            args.putSerializable(KEY_TODO, toDo);
             fragment.setArguments(args);
         }
 
@@ -90,9 +87,10 @@ public class ToDoDetailFragment extends Fragment {
         Bundle args = getArguments();
 
         if (args != null) {
-            todoUri = (Uri) args.getParcelable(KEY_TODO_URI);
-            fillData(todoUri);
+            toDo = (ToDo) args.getSerializable(KEY_TODO);
+            fillData();
         }
+
         return v;
     }
 
@@ -121,57 +119,23 @@ public class ToDoDetailFragment extends Fragment {
     }
 
 
-    private void fillData(Uri todoUri) {
+    private void fillData() {
 
-        String[] projection = new String[]{
-                TodoTable.COLUMN_SUMMARY,
-                TodoTable.COLUMN_DESCRIPTION,
-                TodoTable.COLUMN_CATEGORY
-        };
-
-        Cursor cursor = getActivity().getContentResolver().query(
-                todoUri,
-                projection,
-                null,
-                null,
-                null);
-
-        if (cursor != null) {
-
-            cursor.moveToFirst();
-
-            if (!cursor.isAfterLast()) {
-
-
-                String category = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_CATEGORY));
-
-                String summary = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY));
-
-                String description = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION));
-
-
-                mEditTextSummary.setText(summary);
-                mEditTextDescription.setText(description);
-
-                for (int i = 0; i < mSpinnerCategory.getCount(); i++) {
-                    if (category.equals(mSpinnerCategory.getItemAtPosition(i))) {
-                        mSpinnerCategory.setSelection(i);
-                        break;
-                    }
-                }
-
-                if (todo == null) {
-                    todo = new ToDo(summary, description, Category.valueOf(category));
-                    todo.setID(todoUri.getLastPathSegment());
-                }
-            }
-
-            cursor.close();
+        if (toDo == null) {
+            return;
         }
 
+        String category = toDo.getCategory().toString();
+
+        mEditTextSummary.setText(toDo.getSummary());
+        mEditTextDescription.setText(toDo.getDescription());
+
+        for (int i = 0; i < mSpinnerCategory.getCount(); i++) {
+            if (category.equals(mSpinnerCategory.getItemAtPosition(i))) {
+                mSpinnerCategory.setSelection(i);
+                break;
+            }
+        }
     }
 
     @Override
@@ -203,21 +167,27 @@ public class ToDoDetailFragment extends Fragment {
         String summary = mEditTextSummary.getText().toString();
         String description = mEditTextDescription.getText().toString();
 
-        if (summary.trim().length() == 0) {
-            return false;
+        if (toDo == null) {
+            toDo = new ToDo();
+            toDo.setUser(ParseUser.getCurrentUser());
+            ParseACL parseACL = new ParseACL();
+            parseACL.setReadAccess(ParseUser.getCurrentUser(), true);
+            parseACL.setWriteAccess(ParseUser.getCurrentUser(), true);
+            toDo.setACL(parseACL);
         }
 
-        ContentValues values = new ContentValues();
+        toDo.setCategory(Category.valueOf(category));
+        toDo.setSummary(summary);
+        toDo.setDescription(description);
 
-        values.put(TodoTable.COLUMN_CATEGORY, category);
-        values.put(TodoTable.COLUMN_DESCRIPTION, description);
-        values.put(TodoTable.COLUMN_SUMMARY, summary);
-
-        if (todoUri == null) {
-            todoUri = getActivity().getContentResolver().insert(TodoContentProvider.CONTENT_URI, values);
-        } else {
-            getActivity().getContentResolver().update(todoUri, values, null, null);
-        }
+        toDo.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(getClass().getSimpleName(), e.getMessage());
+                }
+            }
+        });
 
         mToDoChanged = false;
 
@@ -228,13 +198,20 @@ public class ToDoDetailFragment extends Fragment {
     private int deleteData() {
 
 
-        if (todoUri == null) {
+        if (toDo == null) {
             return 0;
         }
-        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + todoUri.getLastPathSegment());
 
-        int rowsDeleted = getActivity().getContentResolver().delete(uri, null, null);
-        return rowsDeleted;
+        toDo.deleteInBackground(new DeleteCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e(getClass().getSimpleName(), e.getMessage());
+                }
+            }
+        });
+
+        return 1;
     }
 
     private void showDeleteConfirmationDialog() {
@@ -266,8 +243,6 @@ public class ToDoDetailFragment extends Fragment {
 
     public void showSaveConfirmationDialog() {
 
-
-        mToDoChanged = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setMessage("Save changes before exiting ?")
@@ -291,10 +266,12 @@ public class ToDoDetailFragment extends Fragment {
     }
 
     private void saveAndExitIfNotEmptySummary() {
+
+        mToDoChanged = false;
+
         if (saveData()) {
             Toast.makeText(getActivity(), "ToDo saved ...", Toast.LENGTH_SHORT)
                     .show();
-//            mOnSuicideListener.onFragmentSuicide();
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getActivity(), "Give ToDo a summary ..", Toast.LENGTH_SHORT)
@@ -336,21 +313,6 @@ public class ToDoDetailFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-/*
-    public OnSuicideListener getOnSuicideListener() {
-        return mOnSuicideListener;
-    }
-
-    public void setOnSuicideListener(OnSuicideListener onSuicideListener) {
-        mOnSuicideListener = onSuicideListener;
-    }
-*/
-
-
-    public interface OnSuicideListener {
-        public void onFragmentSuicide();
     }
 
     private void hideSoftKeyboard(View view) {

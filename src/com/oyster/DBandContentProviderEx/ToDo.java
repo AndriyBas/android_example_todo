@@ -2,6 +2,9 @@ package com.oyster.DBandContentProviderEx;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
+
+import java.io.Serializable;
 
 /**
  * @author bamboo
@@ -9,34 +12,27 @@ import com.parse.ParseObject;
  */
 
 @ParseClassName("ToDo")
-public class ToDo extends ParseObject {
+public class ToDo extends ParseObject implements Serializable {
 
-    public static final String KEY_ID = "_id";
+
+    public static final String KEY_USER = "user";
     public static final String KEY_SUMMARY = "summary";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_CATEGORY = "category";
 
-    private ToDo() {
-    }
-
-    public ToDo(String summary, String description, Category category) {
-        setSummary(summary);
-        setDescription(description);
-        setCategory(category);
-    }
-
-
-    public ToDo(String id, String summary, String description, Category category) {
-        this(summary, description, category);
-        setID(id);
+    public ToDo() {
     }
 
     public String getID() {
-        return getString(KEY_ID);
+        return getObjectId();
     }
 
-    public void setID(String ID) {
-        put(KEY_ID, ID);
+    public ParseUser getUser() {
+        return getParseUser(KEY_USER);
+    }
+
+    public void setUser(ParseUser user) {
+        put(KEY_USER, user);
     }
 
     public String getSummary() {
@@ -62,4 +58,6 @@ public class ToDo extends ParseObject {
     public void setCategory(Category category) {
         put(KEY_CATEGORY, category.toString());
     }
+
+
 }

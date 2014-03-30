@@ -3,28 +3,29 @@ package com.oyster.DBandContentProviderEx;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
-import android.widget.*;
+import android.widget.AbsListView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
+import com.parse.ParseUser;
 
 /**
  * @author bamboo
  * @since 3/24/14 9:53 PM
  */
-public class ToDoMainFragment extends ListFragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ToDoMainFragment extends ListFragment {
 
 
     private static final int MENU_DELETE_ID = Menu.FIRST + 1;
-    private ToDoCursorAdapter mCursorAdapter;
+
+    private ToDoParseAdapter mToDoParseAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class ToDoMainFragment extends ListFragment
 //        registerForContextMenu(getListView());
 //        registerForContextMenu(getListView());
 //        getListView().setDividerHeight(3);
+
     }
 
     @Override
@@ -50,7 +52,6 @@ public class ToDoMainFragment extends ListFragment
         fillData();
 
         Log.i(getClass().getSimpleName(), " :  onCreateView ");
-
 
         return v;
     }
@@ -93,9 +94,8 @@ public class ToDoMainFragment extends ListFragment
                     switch (item.getItemId()) {
                         case R.id.menu_main_context_delete:
 
-
-                            SimpleCursorAdapter adapter = (SimpleCursorAdapter) getListAdapter();
-                            ListView listView = getListView();
+                            // TODO
+                            /*ListView listView = getListView();
 
                             for (int i = 0; i < adapter.getCount(); i++) {
 
@@ -108,6 +108,7 @@ public class ToDoMainFragment extends ListFragment
 
                             mode.finish();
                             adapter.notifyDataSetChanged();
+                            */
                             return true;
 
                         default:
@@ -125,7 +126,7 @@ public class ToDoMainFragment extends ListFragment
         }
 
     }
-
+/*
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -150,7 +151,7 @@ public class ToDoMainFragment extends ListFragment
                 return
                         super.onContextItemSelected(item);
         }
-    }
+    }*/
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -176,11 +177,12 @@ public class ToDoMainFragment extends ListFragment
     }
 
 
-    public void createToDo(Uri uri) {
+    public void createToDo(ToDo toDo) {
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(uri,
-                (ToDoDetailFragment.OnSuicideListener) getActivity());
+
+        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo);
+
         transaction.replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
                 fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT);
         transaction.addToBackStack(null);
@@ -192,56 +194,21 @@ public class ToDoMainFragment extends ListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        // put Uri that refers to the id of the item, it's type is TodoContentProvider.CONTENT_ITEM_TYPE
-        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + id);
-        createToDo(uri);
+        ToDo toDo = mToDoParseAdapter.getItem(position);
+
+        createToDo(toDo);
     }
 
 
     private void fillData() {
 
-//        String[] from = new String[]{TodoTable.COLUMN_SUMMARY};
-//
-//        int[] to = new int[]{R.id.row_textView};
-//
-        getLoaderManager().initLoader(0, null, this);
+        mToDoParseAdapter = new ToDoParseAdapter(getActivity());
 
-//        mCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.todo_row_layout, null, from, to, 0);
+//        mToDoParseAdapter.loadObjects();
+//        mToDoParseAdapter.setAutoload(false);
+//        mToDoParseAdapter.setPaginationEnabled(false);
 
-        mCursorAdapter = new ToDoCursorAdapter(getActivity());
-
-        setListAdapter(mCursorAdapter);
-    }
-
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-
-        String[] projection = new String[]{
-                TodoTable.COLUMN_ID, TodoTable.COLUMN_SUMMARY, TodoTable.COLUMN_CATEGORY
-        };
-
-        CursorLoader cursorLoader = new CursorLoader(
-                getActivity(),
-                TodoContentProvider.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-
-        return cursorLoader;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
-        initListView();
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mCursorAdapter.swapCursor(null);
+        setListAdapter(mToDoParseAdapter);
     }
 
 
@@ -308,48 +275,56 @@ public class ToDoMainFragment extends ListFragment
         Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
     }
 
+    private ParseQueryAdapter.QueryFactory<ToDo> mToDoQueryFactory = new ParseQueryAdapter.QueryFactory<ToDo>() {
+        @Override
+        public ParseQuery<ToDo> create() {
 
-    class ToDoCursorAdapter extends CursorAdapter {
+            ParseQuery<ToDo> parseQuery = ParseQuery.getQuery(ToDo.class);
+            parseQuery.whereEqualTo(ToDo.KEY_USER, ParseUser.getCurrentUser());
+            parseQuery.include("user");
+            parseQuery.orderByDescending("createdAt");
 
-        private LayoutInflater mLayoutInflater;
+            return parseQuery;
+        }
+    };
 
-        public ToDoCursorAdapter(Context context) {
-            super(context, null, 0);
+    class ToDoParseAdapter extends ParseQueryAdapter<ToDo> {
 
-            mLayoutInflater = LayoutInflater.from(context);
+        public ToDoParseAdapter(Context context) {
+            super(context, mToDoQueryFactory);
+
         }
 
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            View v = mLayoutInflater.inflate(R.layout.todo_row_layout, parent, false);
+        public View getItemView(ToDo toDo, View v, ViewGroup parent) {
+            if (v == null) {
+                v = LayoutInflater.from(getActivity()).inflate(R.layout.todo_row_layout, parent, false);
+            }
+
+            Category category = toDo.getCategory();
+            int drawableRes = 0;
+            switch (category) {
+                case Remainder:
+                    drawableRes = android.R.drawable.star_big_off;
+                    break;
+                case Urgent:
+                    drawableRes = android.R.drawable.star_big_on;
+                    break;
+            }
+
+            ImageView imageView = (ImageView) v.findViewById(R.id.todo_row_imageView);
+            assert imageView != null;
+
+            imageView.setImageDrawable(getResources().getDrawable(drawableRes));
+
+            TextView textViewSummary = (TextView) v.findViewById(R.id.todo_row_textView);
+
+            assert textViewSummary != null;
+
+            textViewSummary.setText(toDo.getSummary());
+
             return v;
         }
 
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-
-            TextView textViewSummary = (TextView) view.findViewById(R.id.todo_row_textView);
-            assert textViewSummary != null;
-
-            String summary = cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY));
-            textViewSummary.setText(summary);
-
-            ImageView imageViewCategory = (ImageView) view.findViewById(R.id.todo_row_imageView);
-            assert imageViewCategory != null;
-
-            Category category = Category.valueOf(
-                    cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_CATEGORY)));
-
-            int drawableResources = -1;
-            switch (category) {
-                case Urgent:
-                    drawableResources = android.R.drawable.star_big_on;
-                    break;
-                case Remainder:
-                    drawableResources = android.R.drawable.star_big_off;
-                    break;
-            }
-            imageViewCategory.setImageDrawable(getResources().getDrawable(drawableResources));
-        }
     }
 }

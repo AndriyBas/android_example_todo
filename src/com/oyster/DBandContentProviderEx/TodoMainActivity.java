@@ -3,9 +3,9 @@ package com.oyster.DBandContentProviderEx;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import com.parse.ParseAnalytics;
 
-public class TodoMainActivity extends NavigationDrawerBaseActivity
-        implements ToDoDetailFragment.OnSuicideListener {
+public class TodoMainActivity extends NavigationDrawerBaseActivity {
 
     public static final String TAG_DETAIL_FRAGMENT = "detail_fragment";
 
@@ -22,6 +22,9 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // track how many times the app was opened, could be monitored on parse.com
+        ParseAnalytics.trackAppOpened(getIntent());
+
 
         if (getFragmentContainerId() == R.id.navigation_drawer_fragment_container) {
             FragmentManager fm = getFragmentManager();
@@ -34,7 +37,8 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         }
     }
 
-    @Override
+
+/*
     public void onFragmentSuicide() {
         FragmentManager fm = getFragmentManager();
         while (fm.popBackStackImmediate()) ;
@@ -44,6 +48,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                         // because
                 .commit();
     }
+*/
 
     @Override
     public void onBackPressed() {
