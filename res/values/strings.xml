@@ -10,4 +10,9 @@
     <string name="action_bar_title_detail_fragment">ToDo Details</string>
     <string name="action_bar_title_main_fragment">ToDo List</string>
     <string name="context_menu_delete">Delete</string>
+    <string name="navigation_drawer_open_drawer_cont_desc">Open navigation drawer</string>
+    <string name="navigation_drawer_close_drawer_cont_desc">Close navigation drawer</string>
+    <string name="navigation_drawer_action_bar_open_drawer">Drawer opened</string>
+    <string name="navigation_drawer_action_bar_close_drawer">App name</string>
+    <string name="hello_world">Hello Now Card</string>
 </resources>

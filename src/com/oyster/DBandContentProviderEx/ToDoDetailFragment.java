@@ -267,6 +267,7 @@ public class ToDoDetailFragment extends Fragment {
     public void showSaveConfirmationDialog() {
 
 
+        mToDoChanged = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setMessage("Save changes before exiting ?")

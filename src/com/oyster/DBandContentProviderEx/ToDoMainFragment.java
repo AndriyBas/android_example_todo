@@ -57,7 +57,7 @@ public class ToDoMainFragment extends ListFragment
 
     private void init() {
 
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+//        getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
         getActivity().getActionBar().setTitle(R.string.action_bar_title_main_fragment);
 
 
@@ -181,7 +181,8 @@ public class ToDoMainFragment extends ListFragment
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(uri,
                 (ToDoDetailFragment.OnSuicideListener) getActivity());
-        transaction.replace(R.id.fragmentContainer, fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT);
+        transaction.replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
+                fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT);
         transaction.addToBackStack(null);
         transaction.commit();
 
@@ -223,7 +224,8 @@ public class ToDoMainFragment extends ListFragment
 
         CursorLoader cursorLoader = new CursorLoader(
                 getActivity(),
-                TodoContentProvider.CONTENT_URI, projection,
+                TodoContentProvider.CONTENT_URI,
+                projection,
                 null,
                 null,
                 null);
@@ -264,6 +266,9 @@ public class ToDoMainFragment extends ListFragment
     @Override
     public void onResume() {
         super.onResume();
+
+        ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
+
         Log.i(getClass().getSimpleName(), " :  onResume ");
     }
 
