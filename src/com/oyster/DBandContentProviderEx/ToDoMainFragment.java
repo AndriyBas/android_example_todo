@@ -221,7 +221,6 @@ public class ToDoMainFragment extends ListFragment {
 
     private void fillData() {
 
-
     }
 
 
@@ -296,6 +295,7 @@ public class ToDoMainFragment extends ListFragment {
             parseQuery.whereEqualTo(ToDo.KEY_USER, ParseUser.getCurrentUser());
             parseQuery.include("user");
             parseQuery.orderByDescending("createdAt");
+
             parseQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
 
             return parseQuery;

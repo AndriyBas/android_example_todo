@@ -25,6 +25,10 @@ import java.util.ArrayList;
 public class ToDoDetailFragment extends Fragment {
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b3f4ffb21c966b2b3569631a98d344af67eaebed
     private ToDo toDo;
 
     private EditText mEditTextSummary;
@@ -210,8 +214,11 @@ public class ToDoDetailFragment extends Fragment {
             }
         });
 
+<<<<<<< HEAD
         mToDoChanged = false;
 
+=======
+>>>>>>> b3f4ffb21c966b2b3569631a98d344af67eaebed
         return 1;
     }
 
