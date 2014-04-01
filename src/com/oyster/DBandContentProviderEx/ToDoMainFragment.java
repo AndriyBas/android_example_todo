@@ -11,9 +11,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import com.parse.ParseQuery;
-import com.parse.ParseQueryAdapter;
-import com.parse.ParseUser;
+import com.parse.*;
 
 /**
  * @author bamboo
@@ -63,6 +61,7 @@ public class ToDoMainFragment extends ListFragment {
         return v;
     }
 
+
     private void init() {
 
 //        getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
@@ -101,21 +100,28 @@ public class ToDoMainFragment extends ListFragment {
                     switch (item.getItemId()) {
                         case R.id.menu_main_context_delete:
 
-                            // TODO
-                            /*ListView listView = getListView();
+                            ListView listView = getListView();
 
-                            for (int i = 0; i < adapter.getCount(); i++) {
+                            for (int i = 0; i < mToDoParseAdapter.getCount(); i++) {
 
                                 if (listView.isItemChecked(i)) {
-                                    Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI
-                                            + "/" + listView.getItemIdAtPosition(i));
-                                    getActivity().getContentResolver().delete(uri, null, null);
+
+                                    mToDoParseAdapter.getItem(i).deleteInBackground(new DeleteCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e != null) {
+                                                Log.e(ToDoMainFragment.this.getClass().getSimpleName(),
+                                                        e.getMessage());
+                                            }
+                                        }
+                                    });
+
+                                    ;
                                 }
                             }
 
                             mode.finish();
-                            adapter.notifyDataSetChanged();
-                            */
+                            mToDoParseAdapter.notifyDataSetChanged();
                             return true;
 
                         default:
@@ -284,6 +290,8 @@ public class ToDoMainFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        initListView();
         Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
     }
 
