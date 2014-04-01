@@ -5,7 +5,8 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import com.parse.ParseAnalytics;
 
-public class TodoMainActivity extends NavigationDrawerBaseActivity {
+public class TodoMainActivity extends NavigationDrawerBaseActivity
+        implements ToDoMainFragment.OnCallbacksListener {
 
     public static final String TAG_DETAIL_FRAGMENT = "detail_fragment";
 
@@ -20,6 +21,12 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
+
+//        getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+
+//        getActionBar().setBackgroundDrawable(getResources().getDrawable(R.drawable.action_bar_overlay));
+
         super.onCreate(savedInstanceState);
 
         // track how many times the app was opened, could be monitored on parse.com
@@ -61,9 +68,22 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity {
             ToDoDetailFragment toDoDetailFragment = (ToDoDetailFragment) fragment;
             if (toDoDetailFragment.isToDoChanged()) {
                 toDoDetailFragment.showSaveConfirmationDialog();
+
                 return;
             }
+//            if(toDoDetailFragment.isNewDataSaved()) {
+//                Fragment fragmentMain = fm.findFragmentById(getFragmentContainerId());
+//                if(fragmentMain != null && fragmentMain instanceof ToDoMainFragment) {
+//                    ((ToDoMainFragment)fragmentMain).getCustomAdapter().notifyDataSetChanged();
+//                }
+//            }
         }
         super.onBackPressed();
+    }
+
+    @Override
+    public void OnCallbackCalled() {
+
+
     }
 }

@@ -1,7 +1,6 @@
 package com.oyster.DBandContentProviderEx;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -22,13 +21,8 @@ import java.util.ArrayList;
  * @author bamboo
  * @since 3/24/14 9:53 PM
  */
-public class ToDoDetailFragment extends Fragment {
+public class ToDoDetailFragment extends DebugLoggingFragment {
 
-
-<<<<<<< HEAD
-=======
-
->>>>>>> b3f4ffb21c966b2b3569631a98d344af67eaebed
     private ToDo toDo;
 
     private EditText mEditTextSummary;
@@ -55,6 +49,7 @@ public class ToDoDetailFragment extends Fragment {
     };
 
     private Boolean mToDoChanged = false;
+    private boolean mNewDataSaved = false;
 
     public static ToDoDetailFragment newInstance(ToDo toDo) {
 
@@ -78,12 +73,15 @@ public class ToDoDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.todo_detail_layout, container, false);
+
+        super.onCreateView(null, null, null);
 
         init(v);
 
@@ -193,6 +191,7 @@ public class ToDoDetailFragment extends Fragment {
         });
 
         mToDoChanged = false;
+        mNewDataSaved = true;
 
         return true;
     }
@@ -214,11 +213,8 @@ public class ToDoDetailFragment extends Fragment {
             }
         });
 
-<<<<<<< HEAD
         mToDoChanged = false;
 
-=======
->>>>>>> b3f4ffb21c966b2b3569631a98d344af67eaebed
         return 1;
     }
 
@@ -299,6 +295,9 @@ public class ToDoDetailFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        // for debug mode
+        super.onOptionsItemSelected(item);
+
         switch (item.getItemId()) {
             case android.R.id.home:
 
@@ -328,6 +327,10 @@ public class ToDoDetailFragment extends Fragment {
         InputMethodManager imm = (InputMethodManager) getActivity()
                 .getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public boolean isNewDataSaved() {
+        return mNewDataSaved;
     }
 
 /*

@@ -7,12 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.*;
-import android.widget.AbsListView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
@@ -249,6 +247,8 @@ public class ToDoMainFragment extends ListFragment {
         ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
 
         Log.i(getClass().getSimpleName(), " :  onResume ");
+
+
     }
 
     @Override
@@ -296,11 +296,30 @@ public class ToDoMainFragment extends ListFragment {
             parseQuery.include("user");
             parseQuery.orderByDescending("createdAt");
 
-            parseQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_ELSE_NETWORK);
+            parseQuery.setCachePolicy(ParseQuery.CachePolicy.CACHE_THEN_NETWORK);
 
             return parseQuery;
         }
     };
+
+    public BaseAdapter getCustomAdapter() {
+        return mToDoParseAdapter;
+    }
+
+
+    // for effective use of adapter
+    class ViewHolder {
+        TextView holderTextViewSummary;
+        ImageView holderImageViewIcon;
+
+        ViewHolder(TextView textView, ImageView imageView) {
+            holderImageViewIcon = imageView;
+            holderTextViewSummary = textView;
+
+            DateUtils.formatDateTime(getActivity(), System.currentTimeMillis(), DateUtils.FORMAT_SHOW_DATE
+                    | DateUtils.FORMAT_SHOW_TIME);
+        }
+    }
 
     class ToDoParseAdapter extends ParseQueryAdapter<ToDo> {
 
@@ -311,8 +330,13 @@ public class ToDoMainFragment extends ListFragment {
 
         @Override
         public View getItemView(ToDo toDo, View v, ViewGroup parent) {
+
+
             if (v == null) {
                 v = LayoutInflater.from(getActivity()).inflate(R.layout.todo_row_layout, parent, false);
+                ViewHolder holder = new ViewHolder((TextView) v.findViewById(R.id.todo_row_textView),
+                        (ImageView) v.findViewById(R.id.todo_row_imageView));
+                v.setTag(holder);
             }
 
             Category category = toDo.getCategory();
@@ -326,19 +350,21 @@ public class ToDoMainFragment extends ListFragment {
                     break;
             }
 
-            ImageView imageView = (ImageView) v.findViewById(R.id.todo_row_imageView);
-            assert imageView != null;
 
-            imageView.setImageDrawable(getResources().getDrawable(drawableRes));
+            ViewHolder holder = (ViewHolder) v.getTag();
 
-            TextView textViewSummary = (TextView) v.findViewById(R.id.todo_row_textView);
+            holder.holderImageViewIcon.setImageDrawable(getResources().getDrawable(drawableRes));
 
-            assert textViewSummary != null;
-
-            textViewSummary.setText(toDo.getSummary());
+            holder.holderTextViewSummary.setText(toDo.getSummary());
 
             return v;
         }
 
     }
+
+
+    public interface OnCallbacksListener {
+        public void OnCallbackCalled();
+    }
+
 }
