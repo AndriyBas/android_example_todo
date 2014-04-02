@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class TodoDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tododatabase.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
 
     public TodoDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

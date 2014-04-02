@@ -3,6 +3,7 @@ package com.oyster.DBandContentProviderEx;
 import android.app.Application;
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 /**
  * @author bamboo
@@ -18,7 +19,11 @@ public class ToDoApplication extends Application {
         ParseObject.registerSubclass(ToDo.class);
 
         // initializing Parse account with App ID and Client ID
-        Parse.initialize(this, "rlLpWKmTrWC1QaHVhBD5YGypYeYmR0rxGWGsi8LD",
-                "zEv4ijaZMoOy0mBW2sShcziCEJyKmqcXd05T59fY");
+        Parse.initialize(this, ParseKeys.APPLICATION_ID,
+                ParseKeys.CLIENT_KEY);
+    }
+
+    public static String getCurrentUserId() {
+        return ParseUser.getCurrentUser().getObjectId();
     }
 }

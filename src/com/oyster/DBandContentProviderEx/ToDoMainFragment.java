@@ -103,6 +103,7 @@ public class ToDoMainFragment extends ListFragment
 
                                 if (listView.isItemChecked(i)) {
                                     Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI
+                                            + "/" + ToDoApplication.getCurrentUserId()
                                             + "/" + listView.getItemIdAtPosition(i));
                                     getActivity().getContentResolver().delete(uri, null, null);
                                 }
@@ -143,7 +144,8 @@ public class ToDoMainFragment extends ListFragment
                 AdapterView.AdapterContextMenuInfo info =
                         (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-                Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + info.id);
+                Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" +
+                        ToDoApplication.getCurrentUserId() + "/" + info.id);
                 getActivity().getContentResolver().delete(uri, null, null);
                 fillData();
 
@@ -208,7 +210,9 @@ public class ToDoMainFragment extends ListFragment
         super.onListItemClick(l, v, position, id);
 
         // put Uri that refers to the id of the item, it's type is TodoContentProvider.CONTENT_ITEM_TYPE
-        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + id);
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI +
+                "/" + ToDoApplication.getCurrentUserId() +
+                "/" + id);
         createToDo(uri);
     }
 
@@ -232,14 +236,13 @@ public class ToDoMainFragment extends ListFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-
         String[] projection = new String[]{
                 TodoTable.COLUMN_ID, TodoTable.COLUMN_SUMMARY, TodoTable.COLUMN_CATEGORY
         };
 
         CursorLoader cursorLoader = new CursorLoader(
                 getActivity(),
-                TodoContentProvider.CONTENT_URI,
+                Uri.parse(TodoContentProvider.CONTENT_URI + "/" + ToDoApplication.getCurrentUserId()),
                 projection,
                 null,
                 null,

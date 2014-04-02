@@ -28,16 +28,18 @@ public class ToDo extends ParseObject {
         setCategory(category);
     }
 
-    public ToDo(String id, String summary, String description, Category category) {
+    public ToDo(int id, String summary, String description, Category category) {
         this(summary, description, category);
         setLocalID(id);
     }
 
-    public String getLocalID() {
-        return getString(KEY_ID);
+    public int getLocalID() {
+
+        return getInt(KEY_ID);
+
     }
 
-    public void setLocalID(String ID) {
+    public void setLocalID(int ID) {
         put(KEY_ID, ID);
     }
 

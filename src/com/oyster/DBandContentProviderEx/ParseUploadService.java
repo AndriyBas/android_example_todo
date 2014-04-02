@@ -18,7 +18,10 @@ public class ParseUploadService extends IntentService {
 
     public static final String TAG = "ololo_tag_service";
 
-    public static final String KEY_TODO = "com.oyster.ParseUploadService.ToDo";
+    public static final String ACTION_INSERT = "insert";
+    public static final String ACTION_DELETE = "delete";
+    public static final String ACTION_UPDATE = "update";
+
 
     public ParseUploadService() {
         super("ParseUploadService");
@@ -62,7 +65,7 @@ public class ParseUploadService extends IntentService {
 
         ToDo toDo = new ToDo();
 
-        toDo.setLocalID(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_ID)));
+        toDo.setLocalID(cursor.getInt(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_ID)));
 
         toDo.setUser(ParseUser.getCurrentUser());
 
@@ -70,6 +73,7 @@ public class ParseUploadService extends IntentService {
         parseACL.setReadAccess(ParseUser.getCurrentUser(), true);
         parseACL.setWriteAccess(ParseUser.getCurrentUser(), true);
         toDo.setACL(parseACL);
+
 
         toDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
         toDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));

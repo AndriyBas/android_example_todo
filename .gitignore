@@ -29,7 +29,7 @@ proguard/
 .idea/
 proguard-project.txt
 
-
+src/com/oyster/DBandContentProviderEx/ParseKeys.java
 
 *~
 *.properties
