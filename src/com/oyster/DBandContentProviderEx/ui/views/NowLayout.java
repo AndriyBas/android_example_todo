@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
+import com.oyster.DBandContentProviderEx.R;
 
 /**
  * @author bamboo

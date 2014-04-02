@@ -1,7 +1,8 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.utils;
 
 import android.app.Activity;
 import android.os.Bundle;
+import com.oyster.DBandContentProviderEx.R;
 
 /**
  * @author bamboo

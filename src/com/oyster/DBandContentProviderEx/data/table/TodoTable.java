@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.data.table;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;

@@ -1,10 +1,13 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.services;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import com.oyster.DBandContentProviderEx.data.Category;
+import com.oyster.DBandContentProviderEx.data.ToDo;
+import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseUser;

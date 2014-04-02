@@ -1,6 +1,7 @@
 package com.oyster.DBandContentProviderEx;
 
 import android.app.Application;
+import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -21,10 +22,6 @@ public class ToDoApplication extends Application {
         // initializing Parse account with App ID and Client ID
         Parse.initialize(this, ParseKeys.APPLICATION_ID,
                 ParseKeys.CLIENT_KEY);
-    }
-
-    public static String getCurrentUserId() {
-        return ParseUser.getCurrentUser().getObjectId();
     }
 
     public static String getCurrentUserId() {

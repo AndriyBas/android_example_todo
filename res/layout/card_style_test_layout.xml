@@ -6,7 +6,7 @@
             android:layout_height="match_parent"
             android:fillViewport="true">
 
-    <com.oyster.DBandContentProviderEx.NowLayout
+    <com.oyster.DBandContentProviderEx.ui.views.NowLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#e3e3e3"
@@ -198,6 +198,6 @@
                 tools:context=".MainActivity"/>
 
 
-    </com.oyster.DBandContentProviderEx.NowLayout>
+    </com.oyster.DBandContentProviderEx.ui.views.NowLayout>
 
 </ScrollView>

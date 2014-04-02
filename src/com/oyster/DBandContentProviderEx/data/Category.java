@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.data;
 
 /**
  * @author bamboo

@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.data.contentprovider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -10,6 +10,10 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
+import com.oyster.DBandContentProviderEx.ToDoApplication;
+import com.oyster.DBandContentProviderEx.data.database.TodoDatabaseHelper;
+import com.oyster.DBandContentProviderEx.data.table.TodoTable;
+import com.oyster.DBandContentProviderEx.services.ParseUploadService;
 
 import java.util.Arrays;
 import java.util.HashSet;

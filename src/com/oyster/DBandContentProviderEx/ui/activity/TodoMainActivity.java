@@ -1,8 +1,12 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.activity;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.ui.fragment.ToDoDetailFragment;
+import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
+import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
 
 public class TodoMainActivity extends NavigationDrawerBaseActivity
         implements ToDoDetailFragment.OnSuicideListener {
@@ -21,7 +25,6 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
 
         if (getFragmentContainerId() == R.id.navigation_drawer_fragment_container) {

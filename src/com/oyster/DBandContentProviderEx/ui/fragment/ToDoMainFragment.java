@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
@@ -15,6 +15,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import com.oyster.DBandContentProviderEx.*;
+import com.oyster.DBandContentProviderEx.data.Category;
+import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
+import com.oyster.DBandContentProviderEx.data.table.TodoTable;
+import com.oyster.DBandContentProviderEx.ui.activity.DispatchActivity;
+import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
+import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
 import com.parse.ParseUser;
 
 /**

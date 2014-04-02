@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.utils;
 
 import android.app.Activity;
 import android.app.Fragment;

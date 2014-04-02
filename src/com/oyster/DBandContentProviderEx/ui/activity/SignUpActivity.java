@@ -1,6 +1,8 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.activity;
 
 import android.app.Fragment;
+import com.oyster.DBandContentProviderEx.ui.fragment.SignUpFragment;
+import com.oyster.DBandContentProviderEx.utils.SingleFragmentActivity;
 
 /**
  * @author bamboo

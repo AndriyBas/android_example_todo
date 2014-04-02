@@ -23,21 +23,21 @@
             >
 
         <activity
-                android:name=".TodoMainActivity"
+                android:name=".ui.activity.TodoMainActivity"
                 android:label="@string/app_name">
 
         </activity>
 
         <activity
-                android:name=".NavigationDrawerBaseActivity">
+                android:name=".utils.NavigationDrawerBaseActivity">
         </activity>
 
         <activity
-                android:name=".NowCardTestActivity">
+                android:name=".utils.NowCardTestActivity">
 
         </activity>
 
-        <activity android:name=".DispatchActivity"
+        <activity android:name=".ui.activity.DispatchActivity"
                   android:noHistory="true"
                   android:label="@string/app_name"
                   android:screenOrientation="portrait"
@@ -48,23 +48,23 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".LogInOrSignUpActivity"
+        <activity android:name=".ui.activity.LogInOrSignUpActivity"
                   android:screenOrientation="portrait"
                 >
         </activity>
 
-        <activity android:name=".SignUpActivity"
+        <activity android:name=".ui.activity.SignUpActivity"
                   android:screenOrientation="portrait"
                 >
         </activity>
 
         <provider
                 android:authorities="com.oyster.DBandContentProviderEx"
-                android:name=".TodoContentProvider"
+                android:name=".data.contentprovider.TodoContentProvider"
                 />
 
         <service
-                android:name=".ParseUploadService"
+                android:name=".services.ParseUploadService"
                 android:exported="true"
                 />
     </application>

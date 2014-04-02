@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.Fragment;
 import android.app.ProgressDialog;
@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;

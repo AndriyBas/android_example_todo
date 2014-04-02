@@ -1,8 +1,9 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.data.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
 /**
  * @author bamboo

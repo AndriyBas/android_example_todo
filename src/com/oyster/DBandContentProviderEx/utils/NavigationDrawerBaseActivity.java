@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.utils;
 
 import android.app.Activity;
 import android.content.res.Configuration;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
+import com.oyster.DBandContentProviderEx.R;
 
 /**
  * @author bamboo

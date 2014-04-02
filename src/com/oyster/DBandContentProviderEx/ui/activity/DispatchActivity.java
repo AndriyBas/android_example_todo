@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;

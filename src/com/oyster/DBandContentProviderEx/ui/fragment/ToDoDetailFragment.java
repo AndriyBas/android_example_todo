@@ -1,4 +1,4 @@
-package com.oyster.DBandContentProviderEx;
+package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -16,6 +16,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import com.oyster.DBandContentProviderEx.*;
+import com.oyster.DBandContentProviderEx.data.Category;
+import com.oyster.DBandContentProviderEx.data.ToDo;
+import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
+import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
 import java.util.ArrayList;
 
