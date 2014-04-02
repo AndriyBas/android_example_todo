@@ -26,4 +26,8 @@ public class ToDoApplication extends Application {
     public static String getCurrentUserId() {
         return ParseUser.getCurrentUser().getObjectId();
     }
+
+    public static String getCurrentUserId() {
+        return ParseUser.getCurrentUser().getObjectId();
+    }
 }
