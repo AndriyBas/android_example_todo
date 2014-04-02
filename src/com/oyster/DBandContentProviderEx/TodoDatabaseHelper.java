@@ -22,10 +22,10 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
         TodoTable.onCreate(db);
 
     }
-
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         TodoTable.onUpgrade(db, oldVersion, newVersion);
-
     }
+
+
 }

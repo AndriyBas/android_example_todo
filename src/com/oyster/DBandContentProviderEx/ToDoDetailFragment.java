@@ -165,7 +165,7 @@ public class ToDoDetailFragment extends Fragment {
 
                 if (todo == null) {
                     todo = new ToDo(summary, description, Category.valueOf(category));
-                    todo.setID(todoUri.getLastPathSegment());
+                    todo.setLocalID(todoUri.getLastPathSegment());
                 }
             }
 
@@ -267,7 +267,6 @@ public class ToDoDetailFragment extends Fragment {
     public void showSaveConfirmationDialog() {
 
 
-        mToDoChanged = false;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setMessage("Save changes before exiting ?")
@@ -284,6 +283,7 @@ public class ToDoDetailFragment extends Fragment {
 
                 Toast.makeText(getActivity(), "ToDo was not saved ...", Toast.LENGTH_SHORT);
 //                mOnSuicideListener.onFragmentSuicide();
+                mToDoChanged = false;
                 getActivity().onBackPressed();
             }
         });
@@ -295,6 +295,7 @@ public class ToDoDetailFragment extends Fragment {
             Toast.makeText(getActivity(), "ToDo saved ...", Toast.LENGTH_SHORT)
                     .show();
 //            mOnSuicideListener.onFragmentSuicide();
+            mToDoChanged = false;
             getActivity().onBackPressed();
         } else {
             Toast.makeText(getActivity(), "Give ToDo a summary ..", Toast.LENGTH_SHORT)

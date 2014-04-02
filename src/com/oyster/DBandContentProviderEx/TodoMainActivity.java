@@ -36,13 +36,12 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
     @Override
     public void onFragmentSuicide() {
-        FragmentManager fm = getFragmentManager();
-        while (fm.popBackStackImmediate()) ;
-
-        fm.beginTransaction()
-                .replace(R.id.fragmentContainer, createFragment())
-                        // because
-                .commit();
+//        FragmentManager fm = getFragmentManager();
+//        while (fm.popBackStackImmediate()) ;
+//
+//        fm.beginTransaction()
+//                .replace(R.id.fragmentContainer, createFragment())
+//                .commit();
     }
 
     @Override

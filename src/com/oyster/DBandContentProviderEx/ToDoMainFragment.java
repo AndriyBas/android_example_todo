@@ -6,6 +6,7 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
+import com.parse.ParseUser;
 
 /**
  * @author bamboo
@@ -94,7 +96,7 @@ public class ToDoMainFragment extends ListFragment
                         case R.id.menu_main_context_delete:
 
 
-                            SimpleCursorAdapter adapter = (SimpleCursorAdapter) getListAdapter();
+                            ToDoCursorAdapter adapter = (ToDoCursorAdapter) getListAdapter();
                             ListView listView = getListView();
 
                             for (int i = 0; i < adapter.getCount(); i++) {
@@ -168,6 +170,19 @@ public class ToDoMainFragment extends ListFragment
 
                 createToDo(null);
                 return true;
+
+            case R.id.menu_main_sign_out:
+
+
+                ParseUser.logOut();
+
+                Intent i = new Intent(getActivity(), DispatchActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                getActivity().finish();
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

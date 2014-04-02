@@ -63,5 +63,9 @@
                 android:name=".TodoContentProvider"
                 />
 
+        <service
+                android:name=".ParseUploadService"
+                android:exported="true"
+                />
     </application>
 </manifest>

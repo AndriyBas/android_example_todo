@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.widget.FrameLayout;
 
 /**
  * @author bamboo
@@ -16,16 +15,17 @@ public abstract class SingleFragmentActivity extends Activity {
     public abstract Fragment createFragment();
 
     public int getLayoutId() {
-        return R.id.fragmentContainer;
+//        return R.id.fragmentContainer;
+        return android.R.id.content;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FrameLayout frameLayout = new FrameLayout(this);
-        frameLayout.setId(getLayoutId());
-        setContentView(frameLayout);
+//        FrameLayout frameLayout = new FrameLayout(this);
+//        frameLayout.setId(getLayoutId());
+//        setContentView(frameLayout);
 
         FragmentManager fragmentManager = getFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(getLayoutId());

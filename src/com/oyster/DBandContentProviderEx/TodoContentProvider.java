@@ -1,9 +1,6 @@
 package com.oyster.DBandContentProviderEx;
 
-import android.content.ContentProvider;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.UriMatcher;
+import android.content.*;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -107,6 +104,8 @@ public class TodoContentProvider extends ContentProvider {
         switch (uriType) {
             case TODOS:
                 id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
+
+
                 break;
             default:
                 throwEx(uri);
@@ -114,7 +113,15 @@ public class TodoContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-        return Uri.parse(CONTENT_URI + "/" + id);
+        Uri resUri = Uri.parse(CONTENT_URI + "/" + id);
+
+        //*********************************************
+
+        Intent i = new Intent("someAction", resUri, getContext(), ParseUploadService.class);
+        getContext().startService(i);
+        //*********************************************
+
+        return resUri;
     }
 
     @Override
