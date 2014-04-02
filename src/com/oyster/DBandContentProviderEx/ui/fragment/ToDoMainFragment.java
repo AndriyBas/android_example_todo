@@ -15,13 +15,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import com.oyster.DBandContentProviderEx.*;
+import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.oyster.DBandContentProviderEx.ui.activity.DispatchActivity;
-import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
+import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
 import com.parse.ParseUser;
 
 /**
@@ -182,6 +183,9 @@ public class ToDoMainFragment extends ListFragment
 
             case R.id.menu_main_sign_out:
 
+                // keep track of time user was last log in in order to effectively fetch data later
+                // from server's database
+                ToDoApplication.setLastUserSessionDate(System.currentTimeMillis());
 
                 ParseUser.logOut();
 
@@ -333,7 +337,25 @@ public class ToDoMainFragment extends ListFragment
         Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
     }
 
+    /**
+     * Class for effective use of ListAdapter (CursorAdapter here)
+     * makes use of View.setTag(Object tag) method, does not calls findViewById()
+     * each time the row is populated with data, reuses found ids
+     */
+    class RowViewHolder {
+        public TextView mTextViewHolder;
+        public ImageView mImageViewHolder;
 
+        public RowViewHolder(TextView textView, ImageView imageView) {
+            this.mTextViewHolder = textView;
+            this.mImageViewHolder = imageView;
+        }
+    }
+
+
+    /**
+     * just nice CursorAdapter
+     */
     class ToDoCursorAdapter extends CursorAdapter {
 
         private LayoutInflater mLayoutInflater;
@@ -347,20 +369,19 @@ public class ToDoMainFragment extends ListFragment
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             View v = mLayoutInflater.inflate(R.layout.todo_row_layout, parent, false);
+            RowViewHolder holder = new RowViewHolder((TextView) v.findViewById(R.id.todo_row_textView),
+                    (ImageView) v.findViewById(R.id.todo_row_imageView));
+            v.setTag(holder);
             return v;
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
 
-            TextView textViewSummary = (TextView) view.findViewById(R.id.todo_row_textView);
-            assert textViewSummary != null;
+            RowViewHolder holder = (RowViewHolder) view.getTag();
 
             String summary = cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY));
-            textViewSummary.setText(summary);
-
-            ImageView imageViewCategory = (ImageView) view.findViewById(R.id.todo_row_imageView);
-            assert imageViewCategory != null;
+            holder.mTextViewHolder.setText(summary);
 
             Category category = Category.valueOf(
                     cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_CATEGORY)));
@@ -374,7 +395,8 @@ public class ToDoMainFragment extends ListFragment
                     drawableResources = android.R.drawable.star_big_off;
                     break;
             }
-            imageViewCategory.setImageDrawable(getResources().getDrawable(drawableResources));
+
+            holder.mImageViewHolder.setImageDrawable(getResources().getDrawable(drawableResources));
         }
     }
 }

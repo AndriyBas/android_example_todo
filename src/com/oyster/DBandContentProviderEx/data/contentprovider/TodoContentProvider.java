@@ -270,12 +270,10 @@ public class TodoContentProvider extends ContentProvider {
     }
 
     private void runService(String action, Uri uri) {
-
         //*********************************************
         Intent i = new Intent(action, uri, getContext(), ToDoParseUploadService.class);
         getContext().startService(i);
         //*********************************************
-
     }
 
 }
