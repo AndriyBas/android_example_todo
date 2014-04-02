@@ -23,6 +23,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         super.onCreate(savedInstanceState);
 
 
+
         if (getFragmentContainerId() == R.id.navigation_drawer_fragment_container) {
             FragmentManager fm = getFragmentManager();
             Fragment fragment = fm.findFragmentById(R.id.navigation_drawer_fragment_container);

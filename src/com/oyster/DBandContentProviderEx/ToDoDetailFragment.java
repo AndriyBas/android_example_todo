@@ -165,7 +165,7 @@ public class ToDoDetailFragment extends Fragment {
 
                 if (todo == null) {
                     todo = new ToDo(summary, description, Category.valueOf(category));
-                    todo.setLocalID(todoUri.getLastPathSegment());
+                    todo.setLocalID(Integer.parseInt(todoUri.getLastPathSegment()));
                 }
             }
 
@@ -212,9 +212,15 @@ public class ToDoDetailFragment extends Fragment {
         values.put(TodoTable.COLUMN_CATEGORY, category);
         values.put(TodoTable.COLUMN_DESCRIPTION, description);
         values.put(TodoTable.COLUMN_SUMMARY, summary);
+        values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
 
         if (todoUri == null) {
-            todoUri = getActivity().getContentResolver().insert(TodoContentProvider.CONTENT_URI, values);
+
+            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" +
+                    ToDoApplication.getCurrentUserId());
+
+            todoUri = getActivity().getContentResolver().insert(currentUri, values);
+
         } else {
             getActivity().getContentResolver().update(todoUri, values, null, null);
         }
@@ -231,9 +237,10 @@ public class ToDoDetailFragment extends Fragment {
         if (todoUri == null) {
             return 0;
         }
-        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + todoUri.getLastPathSegment());
+//        Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" + todoUri.getLastPathSegment());
 
-        int rowsDeleted = getActivity().getContentResolver().delete(uri, null, null);
+        int rowsDeleted = getActivity().getContentResolver().delete(todoUri, null, null);
+
         return rowsDeleted;
     }
 

@@ -15,18 +15,20 @@ public class TodoTable {
     public static final String COLUMN_SUMMARY = "summary";
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_CATEGORY = "category";
-    public static final String COLUMN_USER_ID = "user_id";
+    public static final String COLUMN_USER_ID = "userId";
 
     public static final String[] AVAILABLE_COLUMNS = new String[]{
             COLUMN_ID,
             COLUMN_SUMMARY,
             COLUMN_DESCRIPTION,
-            COLUMN_CATEGORY
+            COLUMN_CATEGORY,
+            COLUMN_USER_ID
     };
 
     public static final String CREATE_TABLE = "create table " +
             TABLE_NAME + " ( " +
             COLUMN_ID + " integer primary key autoincrement, " +
+            COLUMN_USER_ID + " text not null," +
             COLUMN_SUMMARY + " text not null," +
             COLUMN_DESCRIPTION + " text not null," +
             COLUMN_CATEGORY + " text not null" +

@@ -1,11 +1,15 @@
 package com.oyster.DBandContentProviderEx;
 
-import android.content.*;
+import android.content.ContentProvider;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,8 +22,11 @@ public class TodoContentProvider extends ContentProvider {
 
     private TodoDatabaseHelper mTodoDatabaseHelper;
 
-    private static final int TODOS = 7;
-    private static final int TODO_ID = 47;
+//    private static final int TODOS = 7;
+//    private static final int TODO_ID = 47;
+
+    private static final int TODOS_USER = 7;
+    private static final int TODOS_USER_toDoID = 47;
 
     private static final String BASE_PATH = "todos";
     private static final String AUTHORITY = "com.oyster.DBandContentProviderEx";
@@ -27,17 +34,16 @@ public class TodoContentProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
             + "/" + BASE_PATH);
 
-    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-            + "/todo";
-    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-            + "/todo";
+//    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+//            + "/todo";
+//    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+//            + "/todo";
 
     public static final UriMatcher sUriMather = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sUriMather.addURI(AUTHORITY, BASE_PATH, TODOS);
-        sUriMather.addURI(AUTHORITY, BASE_PATH + "/#", TODO_ID);
-
+        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*", TODOS_USER);
+        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/#", TODOS_USER_toDoID);
     }
 
 
@@ -63,11 +69,18 @@ public class TodoContentProvider extends ContentProvider {
 
         int uriType = sUriMather.match(uri);
         switch (uriType) {
-            case TODOS:
+            case TODOS_USER:
+
+                sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_USER_ID + "='"
+                        + ToDoApplication.getCurrentUserId() + "'");
                 break;
-            case TODO_ID:
-                // adding the ID to the original query
-                sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_ID + "="
+
+            case TODOS_USER_toDoID:
+//                adding the userID and todoID to the original query
+                sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_USER_ID + "='"
+                        + ToDoApplication.getCurrentUserId() + "'");
+
+                sqLiteQueryBuilder.appendWhere(" AND " + TodoTable.COLUMN_ID + "="
                         + uri.getLastPathSegment());
                 break;
             default:
@@ -95,17 +108,18 @@ public class TodoContentProvider extends ContentProvider {
         return null;
     }
 
+
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+
 
         int uriType = sUriMather.match(uri);
         SQLiteDatabase sqLiteDatabase = mTodoDatabaseHelper.getWritableDatabase();
         long id = 0L;
 
         switch (uriType) {
-            case TODOS:
+            case TODOS_USER:
                 id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
-
 
                 break;
             default:
@@ -114,11 +128,12 @@ public class TodoContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-        Uri resUri = Uri.parse(CONTENT_URI + "/" + id);
+        Uri resUri = Uri.parse(uri + "/" + id);
 
+        Log.i(ParseUploadService.TAG, String.valueOf(id));
         //*********************************************
 
-        Intent i = new Intent("someAction", resUri, getContext(), ParseUploadService.class);
+        Intent i = new Intent("insert_todo", resUri, getContext(), ParseUploadService.class);
         getContext().startService(i);
         //*********************************************
 
@@ -134,12 +149,23 @@ public class TodoContentProvider extends ContentProvider {
 
         int rowsDeleted = 0;
 
+
         switch (uriType) {
-            case TODO_ID:
+            case TODOS_USER_toDoID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
                             TodoTable.COLUMN_ID + "=" + id, null);
+                } else {
+                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
+                            selection, selectionArgs);
+                }
+                break;
+            case TODOS_USER:
+                String userId = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
+                            TodoTable.COLUMN_USER_ID + "='" + userId + "'", null);
                 } else {
                     rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
                             selection, selectionArgs);
@@ -172,7 +198,15 @@ public class TodoContentProvider extends ContentProvider {
 
 
         switch (uriType) {
-            case TODOS:
+            case TODOS_USER:
+
+                String userId = uri.getLastPathSegment();
+
+                if (TextUtils.isEmpty(selection)
+                        || !selection.contains(TodoTable.COLUMN_USER_ID)) {
+                    selection = TodoTable.COLUMN_USER_ID + "='" + userId + "'";
+                }
+
                 rowsUpdated = sqLiteDatabase.update(
                         TodoTable.TABLE_NAME,
                         values,
@@ -180,7 +214,7 @@ public class TodoContentProvider extends ContentProvider {
                         selectionArgs);
                 break;
 
-            case TODO_ID:
+            case TODOS_USER_toDoID:
                 String id = uri.getLastPathSegment();
                 rowsUpdated = sqLiteDatabase.update(
                         TodoTable.TABLE_NAME,
