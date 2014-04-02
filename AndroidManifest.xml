@@ -64,7 +64,7 @@
                 />
 
         <service
-                android:name=".services.ParseUploadService"
+                android:name=".services.ToDoParseUploadService"
                 android:exported="true"
                 />
     </application>

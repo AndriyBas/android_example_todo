@@ -13,7 +13,7 @@ import android.util.Log;
 import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.database.TodoDatabaseHelper;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
-import com.oyster.DBandContentProviderEx.services.ParseUploadService;
+import com.oyster.DBandContentProviderEx.services.ToDoParseUploadService;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,9 +39,9 @@ public class TodoContentProvider extends ContentProvider {
             + "/" + BASE_PATH);
 
 //    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-//            + "/todo";
+//            + "/todo_";
 //    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-//            + "/todo";
+//            + "/todo_";
 
     public static final UriMatcher sUriMather = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -134,12 +134,9 @@ public class TodoContentProvider extends ContentProvider {
 
         Uri resUri = Uri.parse(uri + "/" + id);
 
-        Log.i(ParseUploadService.TAG, String.valueOf(id));
-        //*********************************************
+        Log.i(ToDoParseUploadService.TAG, String.valueOf(id));
 
-        Intent i = new Intent("insert_todo", resUri, getContext(), ParseUploadService.class);
-        getContext().startService(i);
-        //*********************************************
+        runService(ToDoParseUploadService.ACTION_INSERT, resUri);
 
         return resUri;
     }
@@ -155,6 +152,7 @@ public class TodoContentProvider extends ContentProvider {
 
 
         switch (uriType) {
+
             case TODOS_USER_toDoID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
@@ -165,8 +163,10 @@ public class TodoContentProvider extends ContentProvider {
                             selection, selectionArgs);
                 }
                 break;
+
+            // this better not be called
             case TODOS_USER:
-                String userId = uri.getLastPathSegment();
+              /*  String userId = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
                     rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
                             TodoTable.COLUMN_USER_ID + "='" + userId + "'", null);
@@ -175,11 +175,16 @@ public class TodoContentProvider extends ContentProvider {
                             selection, selectionArgs);
                 }
                 break;
+            */
+                throwEx(uri);
             default:
                 throwEx(uri);
         }
 
         getContext().getContentResolver().notifyChange(uri, null);
+
+
+        runService(ToDoParseUploadService.ACTION_DELETE, uri);
 
         return rowsDeleted;
     }
@@ -202,8 +207,11 @@ public class TodoContentProvider extends ContentProvider {
 
 
         switch (uriType) {
+
+            // better not call this
             case TODOS_USER:
 
+/*
                 String userId = uri.getLastPathSegment();
 
                 if (TextUtils.isEmpty(selection)
@@ -217,6 +225,8 @@ public class TodoContentProvider extends ContentProvider {
                         selection,
                         selectionArgs);
                 break;
+*/
+                throwEx(uri);
 
             case TODOS_USER_toDoID:
                 String id = uri.getLastPathSegment();
@@ -230,7 +240,11 @@ public class TodoContentProvider extends ContentProvider {
                 throwEx(uri);
         }
 
+
         getContext().getContentResolver().notifyChange(uri, null);
+
+        runService(ToDoParseUploadService.ACTION_UPDATE, uri);
+
         return rowsUpdated;
     }
 
@@ -253,6 +267,15 @@ public class TodoContentProvider extends ContentProvider {
 
     private void throwEx(Uri uri) {
         throw new IllegalArgumentException("Unknown Uri : " + uri);
+    }
+
+    private void runService(String action, Uri uri) {
+
+        //*********************************************
+        Intent i = new Intent(action, uri, getContext(), ToDoParseUploadService.class);
+        getContext().startService(i);
+        //*********************************************
+
     }
 
 }
