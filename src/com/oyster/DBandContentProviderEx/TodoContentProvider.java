@@ -37,6 +37,7 @@ public class TodoContentProvider extends ContentProvider {
     static {
         sUriMather.addURI(AUTHORITY, BASE_PATH, TODOS);
         sUriMather.addURI(AUTHORITY, BASE_PATH + "/#", TODO_ID);
+
     }
 
 

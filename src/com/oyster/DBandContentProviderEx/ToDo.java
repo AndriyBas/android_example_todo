@@ -12,7 +12,7 @@ import com.parse.ParseUser;
 @ParseClassName("ToDo")
 public class ToDo extends ParseObject {
 
-    public static final String KEY_ID = "_id";
+    public static final String KEY_ID = "localId";
     public static final String KEY_USER = "user";
     public static final String KEY_SUMMARY = "summary";
     public static final String KEY_DESCRIPTION = "description";

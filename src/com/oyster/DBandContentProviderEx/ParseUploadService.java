@@ -16,7 +16,13 @@ import com.parse.SaveCallback;
  */
 public class ParseUploadService extends IntentService {
 
+    public static final String TAG = "ololo_tag_service";
+
     public static final String KEY_TODO = "com.oyster.ParseUploadService.ToDo";
+
+    public ParseUploadService() {
+        super("ParseUploadService");
+    }
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
@@ -41,34 +47,40 @@ public class ParseUploadService extends IntentService {
         );
 
         if (cursor == null) {
+            Log.i(TAG, "cursor == null");
             return;
         }
 
         cursor.moveToFirst();
 
         if (cursor.isAfterLast() || cursor.isBeforeFirst()) {
+            Log.i(TAG, "empty cursor");
             return;
         }
 
-        Log.i("ololo_service", "start");
+        Log.i(TAG, "start");
 
         ToDo toDo = new ToDo();
-        toDo.setLocalID(String.valueOf(id));
+
+        toDo.setLocalID(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_ID)));
+
         toDo.setUser(ParseUser.getCurrentUser());
+
         ParseACL parseACL = new ParseACL();
         parseACL.setReadAccess(ParseUser.getCurrentUser(), true);
         parseACL.setWriteAccess(ParseUser.getCurrentUser(), true);
         toDo.setACL(parseACL);
-        toDo.setSummary(values.getAsString(TodoTable.COLUMN_SUMMARY));
-        toDo.setDescription(values.getAsString(TodoTable.COLUMN_DESCRIPTION));
-        toDo.setCategory(Category.valueOf(values.getAsString(TodoTable.COLUMN_CATEGORY)));
 
+        toDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
+        toDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));
+        toDo.setCategory(Category.valueOf(
+                cursor.getString(cursor.getColumnIndexOrThrow((TodoTable.COLUMN_CATEGORY)))));
 
         toDo.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
-                    Log.e(getClass().getSimpleName(), e.getMessage());
+                    Log.e(TAG, e.getMessage());
                 }
             }
         });
