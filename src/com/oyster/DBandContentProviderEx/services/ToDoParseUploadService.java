@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.text.format.DateUtils;
 import android.util.Log;
 import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
@@ -64,6 +65,22 @@ public class ToDoParseUploadService extends IntentService {
 
                 updateData(intent);
                 break;
+
+            case ACTION_FETCH_NEW_ITEMS:
+
+                // synchronize with server and update date of synchronization
+                Log.i(TAG, "Started, time : " +
+                        DateUtils.formatDateTime(
+                                getApplicationContext(),
+                                ToDoApplication.getLastServerSynchronizeDate(),
+                                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME
+                        ));
+
+
+                fetch_new_items();
+
+                break;
+
             default:
                 throw new IllegalArgumentException(TAG + ": Unknown action : " + intent.getAction());
         }
@@ -223,12 +240,12 @@ public class ToDoParseUploadService extends IntentService {
 
     }
 
+    private void fetch_new_items() {
 
-    private void fetch_new_items(Intent intent) {
-
+        Log.i(TAG, "started sync");
 
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereGreaterThanOrEqualTo("updateAt", new Date(ToDoApplication.getLastUserSessionDate()));
+        toDoParseQuery.whereGreaterThanOrEqualTo("updatedAt", new Date(ToDoApplication.getLastServerSynchronizeDate()));
 
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
@@ -238,42 +255,54 @@ public class ToDoParseUploadService extends IntentService {
                     Log.e(TAG, e.getMessage());
                     return;
                 }
-
                 // no toDos found
                 if (toDos == null) {
                     return;
                 }
-
-
                 updateAllItems(toDos);
-
             }
         });
-
-
     }
 
     private void updateAllItems(List<ToDo> toDos) {
 
+        Log.i(TAG, "started update, size : " + toDos.size());
+
         for (int i = 0; i < toDos.size(); i++) {
             ToDo t = toDos.get(i);
 
-//            Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_URI + "/"
-//                    + ToDoApplication.getCurrentUserId() + "/" + t.getLocalID());
+            Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_URI + "/"
+                    + ToDoApplication.getCurrentUserId() + "/parseId/" + t.getObjectId());
 
             ContentValues values = new ContentValues();
             values.put(TodoTable.COLUMN_SUMMARY, t.getSummary());
             values.put(TodoTable.COLUMN_DESCRIPTION, t.getDescription());
             values.put(TodoTable.COLUMN_CATEGORY, t.getCategory().toString());
+            values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
 
-            getContentResolver().update(
-                    Uri.parse(TodoContentProvider.CONTENT_URI + ""), // Uri
-                    values, // ContentValues
-                    null, // String where
-                    null  // String[] selectionArgs
-            );
+            Cursor c = fetchCursor(toDoUri);
+
+            Log.i(TAG, " i : " + i + " Cursor.count : " + c.getCount());
+
+            if (c.getCount() > 0) {
+                getContentResolver().update(
+                        toDoUri,
+                        values, // ContentValues
+                        null, // String where
+                        null);  // String[] selectionArgs
+            } else {
+                values.put(TodoTable.COLUMN_PARSE_ID, t.getObjectId());
+                getContentResolver().insert(toDoUri, values);
+            }
+            c.close();
         }
 
+        ToDoApplication.setLastServerSynchronizeDate(System.currentTimeMillis());
+        Log.i(TAG, "finished, time : " +
+                DateUtils.formatDateTime(
+                        getApplicationContext(),
+                        ToDoApplication.getLastServerSynchronizeDate(),
+                        DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME
+                ));
     }
-
 }

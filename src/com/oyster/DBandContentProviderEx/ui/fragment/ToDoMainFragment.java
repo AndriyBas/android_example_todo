@@ -103,7 +103,6 @@ public class ToDoMainFragment extends ListFragment
                     switch (item.getItemId()) {
                         case R.id.menu_main_context_delete:
 
-
                             ToDoCursorAdapter adapter = (ToDoCursorAdapter) getListAdapter();
                             ListView listView = getListView();
 
@@ -179,6 +178,11 @@ public class ToDoMainFragment extends ListFragment
             case R.id.menu_main_insert:
 
                 createToDo(null);
+                return true;
+
+            case R.id.menu_main_sync:
+
+                ((TodoMainActivity) getActivity()).synchronizeWithServer();
                 return true;
 
             case R.id.menu_main_sign_out:
@@ -298,6 +302,7 @@ public class ToDoMainFragment extends ListFragment
 
         ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
 
+
         Log.i(getClass().getSimpleName(), " :  onResume ");
     }
 
@@ -399,4 +404,6 @@ public class ToDoMainFragment extends ListFragment
             holder.mImageViewHolder.setImageDrawable(getResources().getDrawable(drawableResources));
         }
     }
+
+
 }

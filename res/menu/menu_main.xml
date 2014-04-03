@@ -3,6 +3,13 @@
 <menu
         xmlns:android="http://schemas.android.com/apk/res/android"
         >
+
+    <item
+            android:id="@+id/menu_main_sync"
+            android:showAsAction="always"
+            android:title="@string/menu_main_sync"
+            android:icon="@android:drawable/stat_notify_sync"
+            />
     <item
             android:id="@+id/menu_main_insert"
             android:showAsAction="always|withText"

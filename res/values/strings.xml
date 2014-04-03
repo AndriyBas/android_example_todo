@@ -22,4 +22,5 @@
     <string name="prompt_full_name">full name</string>
     <string name="prompt_email">email</string>
     <string name="menu_main_sign_out">Sign out</string>
+    <string name="menu_main_sync">Sync</string>
 </resources>

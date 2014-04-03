@@ -2,8 +2,10 @@ package com.oyster.DBandContentProviderEx.ui.activity;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.os.Bundle;
 import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.services.ToDoParseUploadService;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoDetailFragment;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
@@ -63,5 +65,15 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             }
         }
         super.onBackPressed();
+    }
+
+    public void synchronizeWithServer() {
+        // synchronize with server
+        Intent i = new Intent(
+                ToDoParseUploadService.ACTION_FETCH_NEW_ITEMS, // action
+                null,                                          // uri
+                this,                                 // context
+                ToDoParseUploadService.class);                 // Service
+        startService(i);
     }
 }

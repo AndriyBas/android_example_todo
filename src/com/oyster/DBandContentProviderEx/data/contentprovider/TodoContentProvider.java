@@ -25,9 +25,6 @@ public class TodoContentProvider extends ContentProvider {
 
     private TodoDatabaseHelper mTodoDatabaseHelper;
 
-//    private static final int TODOS = 7;
-//    private static final int TODO_ID = 47;
-
     private static final int TODOS_USER = 7;
     private static final int TODOS_USER_localToDoID = 44;
     private static final int TODOS_USER_parseToDoID = 47;
@@ -49,7 +46,7 @@ public class TodoContentProvider extends ContentProvider {
     static {
         sUriMather.addURI(AUTHORITY, BASE_PATH + "/*", TODOS_USER);
         sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/localId/#", TODOS_USER_localToDoID);
-        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/parseId/#", TODOS_USER_parseToDoID);
+        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/parseId/*", TODOS_USER_parseToDoID);
     }
 
 
@@ -139,6 +136,12 @@ public class TodoContentProvider extends ContentProvider {
             case TODOS_USER:
                 id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
 
+                runService(ToDoParseUploadService.ACTION_INSERT, Uri.parse(uri + "/localId/" + id));
+
+                break;
+            case TODOS_USER_parseToDoID:
+
+                id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
                 break;
             default:
                 throwEx(uri);
@@ -150,7 +153,6 @@ public class TodoContentProvider extends ContentProvider {
 
         Log.i(ToDoParseUploadService.TAG, String.valueOf(id));
 
-        runService(ToDoParseUploadService.ACTION_INSERT, resUri);
 
         return resUri;
     }
@@ -182,6 +184,13 @@ public class TodoContentProvider extends ContentProvider {
 //                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
 //                            selection, selectionArgs);
 //                }
+
+
+                Intent i = new Intent(ToDoParseUploadService.ACTION_DELETE, uri, getContext(), ToDoParseUploadService.class);
+                i.putExtra(ToDoParseUploadService.KEY_PARSE_ID, parseIdToDelete);
+                getContext().startService(i);
+
+
                 break;
 
             case TODOS_USER_parseToDoID:
@@ -215,10 +224,6 @@ public class TodoContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-
-        Intent i = new Intent(ToDoParseUploadService.ACTION_DELETE, uri, getContext(), ToDoParseUploadService.class);
-        i.putExtra(ToDoParseUploadService.KEY_PARSE_ID, parseIdToDelete);
-        getContext().startService(i);
 
         return rowsDeleted;
     }
@@ -268,6 +273,9 @@ public class TodoContentProvider extends ContentProvider {
                         values,
                         TodoTable.COLUMN_LOCAL_ID + "=" + id,
                         null);
+
+                runService(ToDoParseUploadService.ACTION_UPDATE, uri);
+
                 break;
 
             case TODOS_USER_parseToDoID:
@@ -275,18 +283,18 @@ public class TodoContentProvider extends ContentProvider {
                 rowsUpdated = sqLiteDatabase.update(
                         TodoTable.TABLE_NAME,
                         values,
-                        TodoTable.COLUMN_LOCAL_ID + "='" + parseId + "'",
+                        TodoTable.COLUMN_PARSE_ID + "='" + parseId + "'",
                         null);
+
+                Log.i("ololo_", "id : " + parseId + ",   rows updated : " + rowsUpdated);
+
                 break;
 
             default:
                 throwEx(uri);
         }
 
-
         getContext().getContentResolver().notifyChange(uri, null);
-
-        runService(ToDoParseUploadService.ACTION_UPDATE, uri);
 
         return rowsUpdated;
     }

@@ -260,6 +260,7 @@ public class ToDoDetailFragment extends Fragment {
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        mToDoChanged = false;
                         deleteData();
                         Toast.makeText(getActivity(), "ToDo deleted ...", Toast.LENGTH_SHORT)
                                 .show();
