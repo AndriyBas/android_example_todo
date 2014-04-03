@@ -12,35 +12,18 @@ import com.parse.ParseUser;
 @ParseClassName("ToDo")
 public class ToDo extends ParseObject {
 
-    public static final String KEY_ID = "localId";
     public static final String KEY_USER = "user";
     public static final String KEY_SUMMARY = "summary";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_CATEGORY = "category";
 
     public ToDo() {
-
     }
 
     public ToDo(String summary, String description, Category category) {
         setSummary(summary);
         setDescription(description);
         setCategory(category);
-    }
-
-    public ToDo(int id, String summary, String description, Category category) {
-        this(summary, description, category);
-        setLocalID(id);
-    }
-
-    public int getLocalID() {
-
-        return getInt(KEY_ID);
-
-    }
-
-    public void setLocalID(int ID) {
-        put(KEY_ID, ID);
     }
 
     public ParseUser getUser() {

@@ -27,7 +27,7 @@ public class TodoTable {
 
     public static final String CREATE_TABLE = "create table " +
             TABLE_NAME + " ( " +
-            COLUMN_ID + " integer primary key autoincrement, " +
+            COLUMN_ID + " text primary key null, " +
             COLUMN_USER_ID + " text not null," +
             COLUMN_SUMMARY + " text not null," +
             COLUMN_DESCRIPTION + " text not null," +

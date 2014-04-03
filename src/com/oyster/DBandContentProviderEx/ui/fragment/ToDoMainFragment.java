@@ -112,7 +112,7 @@ public class ToDoMainFragment extends ListFragment
                                 if (listView.isItemChecked(i)) {
                                     Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI
                                             + "/" + ToDoApplication.getCurrentUserId()
-                                            + "/" + listView.getItemIdAtPosition(i));
+                                            + "/localId/" + listView.getItemIdAtPosition(i));
                                     getActivity().getContentResolver().delete(uri, null, null);
                                 }
                             }
@@ -153,7 +153,7 @@ public class ToDoMainFragment extends ListFragment
                         (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
                 Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI + "/" +
-                        ToDoApplication.getCurrentUserId() + "/" + info.id);
+                        ToDoApplication.getCurrentUserId() + "/localId/" + info.id);
                 getActivity().getContentResolver().delete(uri, null, null);
                 fillData();
 
@@ -223,7 +223,7 @@ public class ToDoMainFragment extends ListFragment
         // put Uri that refers to the id of the item, it's type is TodoContentProvider.CONTENT_ITEM_TYPE
         Uri uri = Uri.parse(TodoContentProvider.CONTENT_URI +
                 "/" + ToDoApplication.getCurrentUserId() +
-                "/" + id);
+                "/localId/" + id);
         createToDo(uri);
     }
 

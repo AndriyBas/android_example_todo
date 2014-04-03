@@ -1,15 +1,19 @@
 package com.oyster.DBandContentProviderEx.services;
 
 import android.app.IntentService;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.ToDo;
+import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.parse.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,6 +27,7 @@ public class ToDoParseUploadService extends IntentService {
     public static final String ACTION_INSERT = "ToDoParseUploadService.insert";
     public static final String ACTION_DELETE = "ToDoParseUploadService.delete";
     public static final String ACTION_UPDATE = "ToDoParseUploadService.update";
+    public static final String ACTION_FETCH_NEW_ITEMS = "ToDoParseUploadService.fetch_new_items";
 
 
     public ToDoParseUploadService() {
@@ -65,6 +70,7 @@ public class ToDoParseUploadService extends IntentService {
 
         Uri toDoUri = intent.getData();
 
+
         Cursor cursor = getContentResolver().query(
                 toDoUri, // uri
                 null, // projection, null returns all values
@@ -83,7 +89,7 @@ public class ToDoParseUploadService extends IntentService {
 
         ToDo toDo = new ToDo();
 
-        toDo.setLocalID(cursor.getInt(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_ID)));
+        Log.i(TAG, toDo.getObjectId());
 
         toDo.setUser(ParseUser.getCurrentUser());
 
@@ -100,7 +106,7 @@ public class ToDoParseUploadService extends IntentService {
         final Uri toDoUri = intent.getData();
 
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereEqualTo(ToDo.KEY_ID, Integer.parseInt(toDoUri.getLastPathSegment()));
+        toDoParseQuery.whereEqualTo("objectId", toDoUri.getLastPathSegment());
 
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
@@ -169,7 +175,7 @@ public class ToDoParseUploadService extends IntentService {
         Uri toDoUri = intent.getData();
 
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereEqualTo(ToDo.KEY_ID, Integer.parseInt(toDoUri.getLastPathSegment()));
+        toDoParseQuery.whereEqualTo("objectId", toDoUri.getLastPathSegment());
 
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
@@ -195,6 +201,59 @@ public class ToDoParseUploadService extends IntentService {
                 });
             }
         });
+
+    }
+
+
+    private void fetch_new_items(Intent intent) {
+
+
+        ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
+        toDoParseQuery.whereGreaterThanOrEqualTo("updateAt", new Date(ToDoApplication.getLastUserSessionDate()));
+
+        toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
+            @Override
+            public void done(List<ToDo> toDos, ParseException e) {
+                // error occurred
+                if (e != null) {
+                    Log.e(TAG, e.getMessage());
+                    return;
+                }
+
+                // no toDos found
+                if (toDos == null) {
+                    return;
+                }
+
+
+                updateAllItems(toDos);
+
+            }
+        });
+
+
+    }
+
+    private void updateAllItems(List<ToDo> toDos) {
+
+        for (int i = 0; i < toDos.size(); i++) {
+            ToDo t = toDos.get(i);
+
+//            Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_URI + "/"
+//                    + ToDoApplication.getCurrentUserId() + "/" + t.getLocalID());
+
+            ContentValues values = new ContentValues();
+            values.put(TodoTable.COLUMN_SUMMARY, t.getSummary());
+            values.put(TodoTable.COLUMN_DESCRIPTION, t.getDescription());
+            values.put(TodoTable.COLUMN_CATEGORY, t.getCategory().toString());
+
+            getContentResolver().update(
+                    Uri.parse(TodoContentProvider.CONTENT_URI + ""), // Uri
+                    values, // ContentValues
+                    null, // String where
+                    null  // String[] selectionArgs
+            );
+        }
 
     }
 
