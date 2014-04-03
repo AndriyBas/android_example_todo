@@ -27,8 +27,11 @@ public class ToDoParseUploadService extends IntentService {
     public static final String ACTION_INSERT = "ToDoParseUploadService.insert";
     public static final String ACTION_DELETE = "ToDoParseUploadService.delete";
     public static final String ACTION_UPDATE = "ToDoParseUploadService.update";
+
     public static final String ACTION_FETCH_NEW_ITEMS = "ToDoParseUploadService.fetch_new_items";
 
+
+    public static final String KEY_PARSE_ID = "ToDoParseUploadService.parse_id";
 
     public ToDoParseUploadService() {
         super("ToDoParseUploadService");
@@ -70,26 +73,11 @@ public class ToDoParseUploadService extends IntentService {
 
         Uri toDoUri = intent.getData();
 
-
-        Cursor cursor = getContentResolver().query(
-                toDoUri, // uri
-                null, // projection, null returns all values
-                null, // selection
-                null, // selection args
-                null  // sort order
-        );
-
-        assert cursor != null;
-
-        cursor.moveToFirst();
-
-        assert !(cursor.isAfterLast() || cursor.isBeforeFirst());
+        Cursor cursor = fetchCursor(toDoUri);
 
         Log.i(TAG, "start");
 
         ToDo toDo = new ToDo();
-
-        Log.i(TAG, toDo.getObjectId());
 
         toDo.setUser(ParseUser.getCurrentUser());
 
@@ -98,15 +86,20 @@ public class ToDoParseUploadService extends IntentService {
         parseACL.setWriteAccess(ParseUser.getCurrentUser(), true);
         toDo.setACL(parseACL);
 
-        fillBasicAndSaveToDo(toDo, cursor);
+        fillBasicAndSaveToDo(toDo, cursor, toDoUri, true);
     }
 
     private void updateData(Intent intent) {
 
         final Uri toDoUri = intent.getData();
 
+        final Cursor cursor = fetchCursor(toDoUri);
+
+        Log.i(TAG, "start");
+
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereEqualTo("objectId", toDoUri.getLastPathSegment());
+        toDoParseQuery.whereEqualTo("objectId",
+                cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID)));
 
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
@@ -122,7 +115,7 @@ public class ToDoParseUploadService extends IntentService {
                     Log.e(TAG, "empty list returned from Parse");
                 }
 
-                fillBasicAndSaveToDo(toDos.get(0), fetchCursor(toDoUri));
+                fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
             }
         });
     }
@@ -149,33 +142,58 @@ public class ToDoParseUploadService extends IntentService {
      * fill current toDo_ with summary, description and category
      * and save it back in background
      *
-     * @param _toDo  item to fill data with
+     * @param toDo   item to fill data with
      * @param cursor holds data to fill
      */
-    private void fillBasicAndSaveToDo(ToDo _toDo, Cursor cursor) {
+    private void fillBasicAndSaveToDo(final ToDo toDo, final Cursor cursor, final Uri toDoUri, final boolean updateParseId) {
 
-        _toDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
-        _toDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));
-        _toDo.setCategory(Category.valueOf(
+        toDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
+        toDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));
+        toDo.setCategory(Category.valueOf(
                 cursor.getString(cursor.getColumnIndexOrThrow((TodoTable.COLUMN_CATEGORY)))));
 
-        _toDo.saveInBackground(new SaveCallback() {
+        cursor.close();
+
+        toDo.saveEventually(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
                     Log.e(TAG, e.getMessage());
+
+                    return;
+                }
+
+                if (updateParseId) {
+                    updateParseIdLocally(toDoUri, toDo);
                 }
             }
         });
 
+
+    }
+
+    private void updateParseIdLocally(Uri toDoUri, ToDo toDo) {
+
+        ContentValues values = new ContentValues();
+        values.put(TodoTable.COLUMN_PARSE_ID, toDo.getObjectId());
+        getContentResolver().update(
+                toDoUri, // Uri
+                values,  // ContentValues
+                null,    // String where
+                null);   // String[] selectionArgs
     }
 
     private void deleteData(Intent intent) {
 
-        Uri toDoUri = intent.getData();
+
+        final Uri toDoUri = intent.getData();
+
+        String parseIdToDelete = intent.getStringExtra(KEY_PARSE_ID);
+
+        Log.i(TAG, "start");
 
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereEqualTo("objectId", toDoUri.getLastPathSegment());
+        toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
@@ -201,6 +219,7 @@ public class ToDoParseUploadService extends IntentService {
                 });
             }
         });
+
 
     }
 

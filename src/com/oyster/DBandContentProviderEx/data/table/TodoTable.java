@@ -11,14 +11,16 @@ public class TodoTable {
 
     public static final String TABLE_NAME = "todo";
 
-    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_LOCAL_ID = "_id";
+    public static final String COLUMN_PARSE_ID = "parseId";
     public static final String COLUMN_SUMMARY = "summary";
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_CATEGORY = "category";
     public static final String COLUMN_USER_ID = "userId";
 
     public static final String[] AVAILABLE_COLUMNS = new String[]{
-            COLUMN_ID,
+            COLUMN_LOCAL_ID,
+            COLUMN_PARSE_ID,
             COLUMN_SUMMARY,
             COLUMN_DESCRIPTION,
             COLUMN_CATEGORY,
@@ -27,11 +29,12 @@ public class TodoTable {
 
     public static final String CREATE_TABLE = "create table " +
             TABLE_NAME + " ( " +
-            COLUMN_ID + " text primary key null, " +
-            COLUMN_USER_ID + " text not null," +
-            COLUMN_SUMMARY + " text not null," +
-            COLUMN_DESCRIPTION + " text not null," +
-            COLUMN_CATEGORY + " text not null" +
+            COLUMN_LOCAL_ID + " integer primary key autoincrement, " +
+            COLUMN_PARSE_ID + " text, " +
+            COLUMN_USER_ID + " text not null, " +
+            COLUMN_SUMMARY + " text not null, " +
+            COLUMN_DESCRIPTION + " text not null, " +
+            COLUMN_CATEGORY + " text not null " +
             ");";
 
     public static void onCreate(SQLiteDatabase sqLiteDatabase) {

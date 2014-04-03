@@ -248,7 +248,7 @@ public class ToDoMainFragment extends ListFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         String[] projection = new String[]{
-                TodoTable.COLUMN_ID, TodoTable.COLUMN_SUMMARY, TodoTable.COLUMN_CATEGORY
+                TodoTable.COLUMN_LOCAL_ID, TodoTable.COLUMN_SUMMARY, TodoTable.COLUMN_CATEGORY
         };
 
         CursorLoader cursorLoader = new CursorLoader(

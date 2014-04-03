@@ -29,7 +29,8 @@ public class TodoContentProvider extends ContentProvider {
 //    private static final int TODO_ID = 47;
 
     private static final int TODOS_USER = 7;
-    private static final int TODOS_USER_toDoID = 44;
+    private static final int TODOS_USER_localToDoID = 44;
+    private static final int TODOS_USER_parseToDoID = 47;
 
     private static final String BASE_PATH = "todos";
     private static final String AUTHORITY = "com.oyster.DBandContentProviderEx";
@@ -47,7 +48,8 @@ public class TodoContentProvider extends ContentProvider {
 
     static {
         sUriMather.addURI(AUTHORITY, BASE_PATH + "/*", TODOS_USER);
-        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/toDoId/#", TODOS_USER_toDoID);
+        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/localId/#", TODOS_USER_localToDoID);
+        sUriMather.addURI(AUTHORITY, BASE_PATH + "/*" + "/parseId/#", TODOS_USER_parseToDoID);
     }
 
 
@@ -66,7 +68,7 @@ public class TodoContentProvider extends ContentProvider {
             String sortOrder) {
 
 //      Used only when recreating the table
-//        TodoTable.onUpgrade(mTodoDatabaseHelper.getWritableDatabase(), 3, 4);
+//        TodoTable.onUpgrade(mTodoDatabaseHelper.getWritableDatabase(), 5, 6);
 
         SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
 
@@ -79,15 +81,23 @@ public class TodoContentProvider extends ContentProvider {
 
             case TODOS_USER:
                 sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_USER_ID + "='"
-                        + ToDoApplication.getCurrentUserId() + "'");
+                        + uri.getLastPathSegment() + "'");
                 break;
 
-            case TODOS_USER_toDoID:
-//                adding the userID and todoID to the original query
+            case TODOS_USER_localToDoID:
+//                adding the userID and local todoID to the original query
                 sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_USER_ID + "='"
                         + ToDoApplication.getCurrentUserId() + "'");
 
-                sqLiteQueryBuilder.appendWhere(" AND " + TodoTable.COLUMN_ID + "='"
+                sqLiteQueryBuilder.appendWhere(" AND " + TodoTable.COLUMN_LOCAL_ID + "="
+                        + uri.getLastPathSegment());
+                break;
+            case TODOS_USER_parseToDoID:
+//                adding the userID and parse todoID to the original query
+                sqLiteQueryBuilder.appendWhere(TodoTable.COLUMN_USER_ID + "='"
+                        + ToDoApplication.getCurrentUserId() + "'");
+
+                sqLiteQueryBuilder.appendWhere(" AND " + TodoTable.COLUMN_PARSE_ID + "='"
                         + uri.getLastPathSegment() + "'");
                 break;
 
@@ -154,14 +164,32 @@ public class TodoContentProvider extends ContentProvider {
 
         int rowsDeleted = 0;
 
+        String parseIdToDelete = null;
 
         switch (uriType) {
 
-            case TODOS_USER_toDoID:
+            case TODOS_USER_localToDoID:
                 String id = uri.getLastPathSegment();
+
+                Cursor c = query(uri, new String[]{TodoTable.COLUMN_PARSE_ID}, null, null, null);
+                c.moveToFirst();
+                parseIdToDelete = c.getString(c.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID));
+
 //                if (TextUtils.isEmpty(selection)) {
                 rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
-                        TodoTable.COLUMN_ID + "=" + id, null);
+                        TodoTable.COLUMN_LOCAL_ID + "=" + id, null);
+//                } else {
+//                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
+//                            selection, selectionArgs);
+//                }
+                break;
+
+            case TODOS_USER_parseToDoID:
+                parseIdToDelete = uri.getLastPathSegment();
+
+//                if (TextUtils.isEmpty(selection)) {
+                rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
+                        TodoTable.COLUMN_LOCAL_ID + "'" + parseIdToDelete + "'", null);
 //                } else {
 //                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
 //                            selection, selectionArgs);
@@ -188,7 +216,9 @@ public class TodoContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
 
 
-        runService(ToDoParseUploadService.ACTION_DELETE, uri);
+        Intent i = new Intent(ToDoParseUploadService.ACTION_DELETE, uri, getContext(), ToDoParseUploadService.class);
+        i.putExtra(ToDoParseUploadService.KEY_PARSE_ID, parseIdToDelete);
+        getContext().startService(i);
 
         return rowsDeleted;
     }
@@ -208,7 +238,6 @@ public class TodoContentProvider extends ContentProvider {
         assert sqLiteDatabase != null;
 
         int rowsUpdated = 0;
-
 
         switch (uriType) {
 
@@ -232,14 +261,24 @@ public class TodoContentProvider extends ContentProvider {
 */
                 throwEx(uri);
 
-            case TODOS_USER_toDoID:
+            case TODOS_USER_localToDoID:
                 String id = uri.getLastPathSegment();
                 rowsUpdated = sqLiteDatabase.update(
                         TodoTable.TABLE_NAME,
                         values,
-                        TodoTable.COLUMN_ID + "=" + id,
+                        TodoTable.COLUMN_LOCAL_ID + "=" + id,
                         null);
                 break;
+
+            case TODOS_USER_parseToDoID:
+                String parseId = uri.getLastPathSegment();
+                rowsUpdated = sqLiteDatabase.update(
+                        TodoTable.TABLE_NAME,
+                        values,
+                        TodoTable.COLUMN_LOCAL_ID + "='" + parseId + "'",
+                        null);
+                break;
+
             default:
                 throwEx(uri);
         }
