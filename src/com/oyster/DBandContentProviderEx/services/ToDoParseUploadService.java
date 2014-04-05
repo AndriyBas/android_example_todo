@@ -94,16 +94,46 @@ public class ToDoParseUploadService extends IntentService {
 
         Log.i(TAG, "start");
 
+/*
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
+
+        String roleName = "todo_role_" + ToDoApplication.getCurrentUserId();
+        ParseRole role = new ParseRole(roleName, acl);
+        role.getUsers().add(ParseUser.getCurrentUser());
+        role.saveInBackground();
+        */
+
+        ParseACL acl = new ParseACL();
+        acl.setPublicReadAccess(true);
+        acl.setPublicWriteAccess(true);
+
+        String roleName = "todo_role_" + ToDoApplication.getCurrentUserId();
+        ParseRole role = new ParseRole(roleName, acl);
+        role.getUsers().add(ParseUser.getCurrentUser());
+        role.saveInBackground();
+
+        ParseACL parseACL = new ParseACL();
+        parseACL.setRoleReadAccess(roleName, true);
+        parseACL.setRoleWriteAccess(roleName, true);
+
+        ParseACL.setDefaultACL(parseACL, true);
+
+
         ToDo toDo = new ToDo();
+
 
         toDo.setUser(ParseUser.getCurrentUser());
 
-        ParseACL parseACL = new ParseACL();
-        parseACL.setReadAccess(ParseUser.getCurrentUser(), true);
-        parseACL.setWriteAccess(ParseUser.getCurrentUser(), true);
+//        ParseACL parseACL = new ParseACL();
+//        parseACL.setRoleReadAccess(roleName, true);
+//        parseACL.setRoleWriteAccess(roleName, true);
         toDo.setACL(parseACL);
 
         fillBasicAndSaveToDo(toDo, cursor, toDoUri, true);
+
+
     }
 
     private void updateData(Intent intent) {
@@ -118,23 +148,17 @@ public class ToDoParseUploadService extends IntentService {
         toDoParseQuery.whereEqualTo("objectId",
                 cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID)));
 
-        toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
-            @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                // if exception occurred
-                if (e != null) {
-                    Log.e(TAG, e.getMessage());
-                    return;
-                }
 
-                // if no items found
-                if (toDos == null || toDos.size() < 1) {
-                    Log.e(TAG, "empty list returned from Parse");
-                }
-
-                fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
+        try {
+            List<ToDo> toDos = toDoParseQuery.find();
+            if (toDos == null || toDos.size() < 1) {
+                Log.e(TAG, "empty list returned from Parse");
             }
-        });
+            fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -169,6 +193,8 @@ public class ToDoParseUploadService extends IntentService {
         toDo.setCategory(Category.valueOf(
                 cursor.getString(cursor.getColumnIndexOrThrow((TodoTable.COLUMN_CATEGORY)))));
 
+        toDo.getACL().setRoleReadAccess("__fuck_like_a_beast", true);
+
         cursor.close();
 
         toDo.saveEventually(new SaveCallback() {
@@ -185,8 +211,6 @@ public class ToDoParseUploadService extends IntentService {
                 }
             }
         });
-
-
     }
 
     private void updateParseIdLocally(Uri toDoUri, ToDo toDo) {
@@ -212,31 +236,25 @@ public class ToDoParseUploadService extends IntentService {
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
         toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
-        toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
-            @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                // if exception occurred
-                if (e != null) {
-                    Log.e(TAG, e.getMessage());
-                    return;
-                }
-
-                // if no items found
-                if (toDos == null || toDos.size() < 1) {
-                    Log.e(TAG, "empty list returned from Parse");
-                }
-
-                toDos.get(0).deleteEventually(new DeleteCallback() {
-                    @Override
-                    public void done(ParseException e) {
-                        if (e != null) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    }
-                });
+        try {
+            List<ToDo> toDos = toDoParseQuery.find();
+            // if no items found
+            if (toDos == null || toDos.size() < 1) {
+                Log.e(TAG, "empty list returned from Parse");
+                return;
             }
-        });
 
+            toDos.get(0).deleteEventually(new DeleteCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e != null) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                }
+            });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -247,21 +265,18 @@ public class ToDoParseUploadService extends IntentService {
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
         toDoParseQuery.whereGreaterThanOrEqualTo("updatedAt", new Date(ToDoApplication.getLastServerSynchronizeDate()));
 
-        toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
-            @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                // error occurred
-                if (e != null) {
-                    Log.e(TAG, e.getMessage());
-                    return;
-                }
-                // no toDos found
-                if (toDos == null) {
-                    return;
-                }
-                updateAllItems(toDos);
+        try {
+            List<ToDo> toDos = toDoParseQuery.find();
+            // no toDos found
+            if (toDos == null) {
+                return;
             }
-        });
+            updateAllItems(toDos);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void updateAllItems(List<ToDo> toDos) {

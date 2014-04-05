@@ -7,6 +7,9 @@ import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author bamboo
  * @since 3/30/14 12:56 PM
@@ -17,6 +20,7 @@ public class ToDoApplication extends Application {
 
     private static final String KEY_LAST_USER_SESSION_DATE = "last_user_session_date";
     private static final String KEY_LAST_SERVER_SYNCHRONIZE_DATE = "last_server_synchronize_date";
+    private static final String KEY_USER_ROLES = "user_roles";
 
     private static SharedPreferences mSharedPreferencesUserSettings;
 
@@ -77,6 +81,31 @@ public class ToDoApplication extends Application {
                 .commit();
     }
 
+    /**
+     * update the set of user roles
+     *
+     * @param userRoles set of new roles to be set
+     */
+    public static void setUserRoles(Set<String> userRoles) {
+        mSharedPreferencesUserSettings
+                .edit().putStringSet(getCurrentUserKey(KEY_USER_ROLES), userRoles)
+                .commit();
+    }
+
+    /**
+     * @return set of roles of the current user
+     */
+    public static Set<String> getUserRoles() {
+        return mSharedPreferencesUserSettings
+                .getStringSet(getCurrentUserKey(KEY_USER_ROLES), new HashSet<String>());
+    }
+
+    /**
+     * generates the unique identifier for current user to its values
+     *
+     * @param key
+     * @return
+     */
     private static String getCurrentUserKey(String key) {
         return key + "_" + getCurrentUserId();
     }

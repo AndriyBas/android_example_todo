@@ -23,6 +23,8 @@ import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.oyster.DBandContentProviderEx.ui.activity.DispatchActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
+import com.parse.ParseACL;
+import com.parse.ParseRole;
 import com.parse.ParseUser;
 
 /**
@@ -50,6 +52,10 @@ public class ToDoMainFragment extends ListFragment
 //        registerForContextMenu(getListView());
 //        registerForContextMenu(getListView());
 //        getListView().setDividerHeight(3);
+
+
+
+
     }
 
     @Override
@@ -167,6 +173,8 @@ public class ToDoMainFragment extends ListFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.menu_main, menu);
+
+
     }
 
 
