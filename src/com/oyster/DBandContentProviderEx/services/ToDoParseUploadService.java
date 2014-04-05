@@ -118,23 +118,17 @@ public class ToDoParseUploadService extends IntentService {
         toDoParseQuery.whereEqualTo("objectId",
                 cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID)));
 
-        toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
-            @Override
-            public void done(List<ToDo> toDos, ParseException e) {
-                // if exception occurred
-                if (e != null) {
-                    Log.e(TAG, e.getMessage());
-                    return;
-                }
 
-                // if no items found
-                if (toDos == null || toDos.size() < 1) {
-                    Log.e(TAG, "empty list returned from Parse");
-                }
-
-                fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
+        try {
+            List<ToDo> toDos = toDoParseQuery.find();
+            if (toDos == null || toDos.size() < 1) {
+                Log.e(TAG, "empty list returned from Parse");
             }
-        });
+            fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
     }
 
 
@@ -185,8 +179,6 @@ public class ToDoParseUploadService extends IntentService {
                 }
             }
         });
-
-
     }
 
     private void updateParseIdLocally(Uri toDoUri, ToDo toDo) {
@@ -212,6 +204,7 @@ public class ToDoParseUploadService extends IntentService {
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
         toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
+
         toDoParseQuery.findInBackground(new FindCallback<ToDo>() {
             @Override
             public void done(List<ToDo> toDos, ParseException e) {
@@ -224,6 +217,7 @@ public class ToDoParseUploadService extends IntentService {
                 // if no items found
                 if (toDos == null || toDos.size() < 1) {
                     Log.e(TAG, "empty list returned from Parse");
+                    return;
                 }
 
                 toDos.get(0).deleteEventually(new DeleteCallback() {
