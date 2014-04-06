@@ -236,6 +236,7 @@ public class ToDoParseUploadService extends IntentService {
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
         toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
+
         try {
             List<ToDo> toDos = toDoParseQuery.find();
             // if no items found
@@ -243,7 +244,6 @@ public class ToDoParseUploadService extends IntentService {
                 Log.e(TAG, "empty list returned from Parse");
                 return;
             }
-
             toDos.get(0).deleteEventually(new DeleteCallback() {
                 @Override
                 public void done(ParseException e) {
