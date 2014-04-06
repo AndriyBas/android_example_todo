@@ -33,3 +33,5 @@ src/com/oyster/DBandContentProviderEx/ParseKeys.java
 
 *~
 *.properties
+
+ToDoCloudCode/call_cloud_func*
