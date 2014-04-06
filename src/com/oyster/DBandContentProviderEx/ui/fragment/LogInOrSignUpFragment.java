@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.ui.activity.SignUpActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
+import com.oyster.DBandContentProviderEx.utils.Utils;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -57,6 +58,10 @@ public class LogInOrSignUpFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+                if (!Utils.isNetworkConnected(getActivity())) {
+                    onLogInError("Network is not available");
+                    return;
+                }
 
                 final String username = mEditTextUsername.getText().toString();
                 final String password = mEditTextPassword.getText().toString();
@@ -113,6 +118,11 @@ public class LogInOrSignUpFragment extends Fragment {
         mButtonSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (!Utils.isNetworkConnected(getActivity())) {
+                    onLogInError("Network is not available");
+                    return;
+                }
 
                 Intent i = new Intent(getActivity(), SignUpActivity.class);
                 startActivity(i);

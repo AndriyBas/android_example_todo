@@ -1,0 +1,2 @@
+curl -X POST   -H "X-Parse-Application-Id: rlLpWKmTrWC1QaHVhBD5YGypYeYmR0rxGWGsi8LD"   -H "X-Parse-REST-API-Key: QIAMoafLpXL1Hiq4kAUGlfNn7mQAzx48Nsqn0S7e"   -H "Content-Type: application/json"   -d '{}'   https://api.parse.com/1/functions/hello
+

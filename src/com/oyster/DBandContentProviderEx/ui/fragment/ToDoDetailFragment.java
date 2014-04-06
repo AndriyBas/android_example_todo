@@ -19,8 +19,8 @@ import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
-import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
+import com.oyster.DBandContentProviderEx.data.parse.ToDo;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
 import java.util.ArrayList;
@@ -224,7 +224,7 @@ public class ToDoDetailFragment extends Fragment {
 
         if (todoUri == null) {
 
-            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_URI +
+            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI +
                     "/" + ToDoApplication.getCurrentUserId());
 
             todoUri = getActivity().getContentResolver().insert(currentUri, values);

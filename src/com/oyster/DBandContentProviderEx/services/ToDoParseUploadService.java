@@ -9,8 +9,8 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
-import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
+import com.oyster.DBandContentProviderEx.data.parse.ToDo;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.parse.*;
 
@@ -28,6 +28,12 @@ public class ToDoParseUploadService extends IntentService {
     public static final String ACTION_INSERT = "ToDoParseUploadService.insert";
     public static final String ACTION_DELETE = "ToDoParseUploadService.delete";
     public static final String ACTION_UPDATE = "ToDoParseUploadService.update";
+
+
+    public static final String ACTION_PROJECT_INSERT = "ToDoParseUploadService.project_insert";
+    public static final String ACTION_PROJECT_DELETE = "ToDoParseUploadService.project_delete";
+    public static final String ACTION_PROJECT_UPDATE = "ToDoParseUploadService.project_update";
+
 
     public static final String ACTION_FETCH_NEW_ITEMS = "ToDoParseUploadService.fetch_new_items";
 
@@ -236,7 +242,6 @@ public class ToDoParseUploadService extends IntentService {
         ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
         toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
-
         try {
             List<ToDo> toDos = toDoParseQuery.find();
             // if no items found
@@ -286,14 +291,17 @@ public class ToDoParseUploadService extends IntentService {
         for (int i = 0; i < toDos.size(); i++) {
             ToDo t = toDos.get(i);
 
-            Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_URI + "/"
+            Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/"
                     + ToDoApplication.getCurrentUserId() + "/parseId/" + t.getObjectId());
 
             ContentValues values = new ContentValues();
             values.put(TodoTable.COLUMN_SUMMARY, t.getSummary());
             values.put(TodoTable.COLUMN_DESCRIPTION, t.getDescription());
             values.put(TodoTable.COLUMN_CATEGORY, t.getCategory().toString());
-            values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
+
+
+            // TODO
+//            values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
 
             Cursor c = fetchCursor(toDoUri);
 

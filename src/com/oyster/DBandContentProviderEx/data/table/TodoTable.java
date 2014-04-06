@@ -11,30 +11,34 @@ public class TodoTable {
 
     public static final String TABLE_NAME = "todo";
 
-    public static final String COLUMN_LOCAL_ID = "_id";
-    public static final String COLUMN_PARSE_ID = "parseId";
-    public static final String COLUMN_SUMMARY = "summary";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_CATEGORY = "category";
-    public static final String COLUMN_USER_ID = "userId";
+    public static final String COLUMN_ID = "_id";
+    public static final String COLUMN_PARSE_ID = "todo_parseId";
+    public static final String COLUMN_SUMMARY = "todo_summary";
+    public static final String COLUMN_DESCRIPTION = "todo_description";
+    public static final String COLUMN_CATEGORY = "todo_category";
+    public static final String COLUMN_PROJECT_ID = "todo_projectId";
+    public static final String COLUMN_UPDATED_AT = "todo_updatedAt";
+
 
     public static final String[] AVAILABLE_COLUMNS = new String[]{
-            COLUMN_LOCAL_ID,
+            COLUMN_ID,
             COLUMN_PARSE_ID,
             COLUMN_SUMMARY,
             COLUMN_DESCRIPTION,
             COLUMN_CATEGORY,
-            COLUMN_USER_ID
+            COLUMN_PROJECT_ID,
+            COLUMN_UPDATED_AT
     };
 
     public static final String CREATE_TABLE = "create table " +
             TABLE_NAME + " ( " +
-            COLUMN_LOCAL_ID + " integer primary key autoincrement, " +
+            COLUMN_ID + " integer primary key, " +
             COLUMN_PARSE_ID + " text, " +
-            COLUMN_USER_ID + " text not null, " +
+            COLUMN_PROJECT_ID + " integer, " +
             COLUMN_SUMMARY + " text not null, " +
             COLUMN_DESCRIPTION + " text not null, " +
-            COLUMN_CATEGORY + " text not null " +
+            COLUMN_CATEGORY + " text not null, " +
+            COLUMN_UPDATED_AT + " integer not null " +
             ");";
 
     public static void onCreate(SQLiteDatabase sqLiteDatabase) {

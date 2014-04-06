@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:padding="5dp"
+        android:paddingLeft="7dp"
+        android:paddingRight="7dp"
+        >
+
+    <EditText
+            android:id="@+id/dialog_new_project_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dialog_prompt_project_summary"
+            android:inputType="text"
+            android:layout_margin="7dp"
+            />
+
+    <EditText
+            android:id="@+id/dialog_new_project_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/dialog_prompt_progect_description"
+            android:inputType="text"
+            android:layout_margin="7dp"
+            />
+
+</LinearLayout>

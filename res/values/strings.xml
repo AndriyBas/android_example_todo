@@ -23,4 +23,8 @@
     <string name="prompt_email">email</string>
     <string name="menu_main_sign_out">Sign out</string>
     <string name="menu_main_sync">Sync</string>
+    <string name="menu_main_new_toDo">New ToDo</string>
+    <string name="menu_main_new_project">New Project</string>
+    <string name="dialog_prompt_project_summary">name or summary</string>
+    <string name="dialog_prompt_progect_description">description</string>
 </resources>

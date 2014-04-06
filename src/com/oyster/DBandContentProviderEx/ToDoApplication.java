@@ -2,7 +2,8 @@ package com.oyster.DBandContentProviderEx;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import com.oyster.DBandContentProviderEx.data.ToDo;
+import com.oyster.DBandContentProviderEx.data.parse.Project;
+import com.oyster.DBandContentProviderEx.data.parse.ToDo;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -16,7 +17,8 @@ import java.util.Set;
  */
 public class ToDoApplication extends Application {
 
-    public static final String SHARED_PREFS_USER_SETTINGS = "com.oyster.ToDoApplication";
+
+    private static final String SHARED_PREFS_USER_SETTINGS = "com.oyster.ToDoApplication";
 
     private static final String KEY_LAST_USER_SESSION_DATE = "last_user_session_date";
     private static final String KEY_LAST_SERVER_SYNCHRONIZE_DATE = "last_server_synchronize_date";
@@ -24,12 +26,14 @@ public class ToDoApplication extends Application {
 
     private static SharedPreferences mSharedPreferencesUserSettings;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
 
         // Register _ToDo_ class to use with Parse functions
         ParseObject.registerSubclass(ToDo.class);
+        ParseObject.registerSubclass(Project.class);
 
         // initializing Parse account with App ID and Client ID
         Parse.initialize(this, ParseKeys.APPLICATION_ID,

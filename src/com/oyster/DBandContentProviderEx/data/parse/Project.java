@@ -1,5 +1,6 @@
-package com.oyster.DBandContentProviderEx.data;
+package com.oyster.DBandContentProviderEx.data.parse;
 
+import com.oyster.DBandContentProviderEx.data.Category;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
@@ -9,21 +10,34 @@ import com.parse.ParseUser;
  * @since 3/24/14 5:42 PM
  */
 
-@ParseClassName("ToDo")
-public class ToDo extends ParseObject {
+@ParseClassName("Project")
+public class Project extends ParseObject {
 
     public static final String KEY_USER = "user";
+    public static final String KEY_LOCAL_ID = "localId";
     public static final String KEY_SUMMARY = "summary";
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_CATEGORY = "category";
 
-    public ToDo() {
+    public Project() {
     }
 
-    public ToDo(String summary, String description, Category category) {
+    public Project(String summary, String description, Category category) {
         setSummary(summary);
         setDescription(description);
         setCategory(category);
+    }
+
+    public long getLocalId() {
+        return getLong(KEY_LOCAL_ID);
+    }
+
+    public void setLocalId(long localId) {
+        put(KEY_LOCAL_ID, localId);
+    }
+
+    public void setProject() {
+
     }
 
     public ParseUser getUser() {

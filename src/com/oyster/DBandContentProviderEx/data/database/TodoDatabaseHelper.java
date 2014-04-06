@@ -11,7 +11,7 @@ import com.oyster.DBandContentProviderEx.data.table.TodoTable;
  */
 public class TodoDatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "tododatabase.db";
+    private static final String DATABASE_NAME = "todo_database.db";
     private static final int DATABASE_VERSION = 1;
 
     public TodoDatabaseHelper(Context context) {
