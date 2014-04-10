@@ -3,6 +3,7 @@ package com.oyster.DBandContentProviderEx.data.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
 /**
@@ -21,12 +22,13 @@ public class TodoDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         TodoTable.onCreate(db);
-
+        ProjectTable.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         TodoTable.onUpgrade(db, oldVersion, newVersion);
+        ProjectTable.onUpgrade(db, oldVersion, newVersion);
     }
 
 

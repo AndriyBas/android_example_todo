@@ -6,7 +6,6 @@ import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,14 +15,11 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
-import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
-import com.oyster.DBandContentProviderEx.ui.activity.DispatchActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
-import com.parse.ParseUser;
 
 /**
  * @author bamboo
@@ -36,6 +32,22 @@ public class ToDoMainFragment extends ListFragment
 
     private static final int MENU_DELETE_ID = Menu.FIRST + 1;
     private ToDoCursorAdapter mCursorAdapter;
+    private long mProjectId;
+
+
+    public final static String KEY_PROJECT_ID = "ToDoMAinFragment.projectId";
+
+
+    public static ToDoMainFragment newInstance(long projectId) {
+
+        ToDoMainFragment toDoMainFragment = new ToDoMainFragment();
+        Bundle args = new Bundle();
+        args.putLong(KEY_PROJECT_ID, projectId);
+
+        toDoMainFragment.setArguments(args);
+
+        return toDoMainFragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +60,8 @@ public class ToDoMainFragment extends ListFragment
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
+        mProjectId = getArguments().getLong(KEY_PROJECT_ID);
+
 //        registerForContextMenu(getListView());
 //        registerForContextMenu(getListView());
 //        getListView().setDividerHeight(3);
@@ -56,10 +70,13 @@ public class ToDoMainFragment extends ListFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+
         View v = inflater.inflate(R.layout.todo_list_layout, container, false);
 
         init();
         fillData();
+
 
         Log.i(getClass().getSimpleName(), " :  onCreateView ");
 
@@ -112,8 +129,8 @@ public class ToDoMainFragment extends ListFragment
 
                                 if (listView.isItemChecked(i)) {
                                     Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI
-                                            + "/" + ToDoApplication.getCurrentUserId()
-                                            + "/localId/" + listView.getItemIdAtPosition(i));
+                                            + "/" + getProjectId()
+                                            + "/toDoId/" + listView.getItemIdAtPosition(i));
                                     getActivity().getContentResolver().delete(uri, null, null);
                                 }
                             }
@@ -133,9 +150,7 @@ public class ToDoMainFragment extends ListFragment
 
                 }
             });
-
         }
-
     }
 
     @Override
@@ -154,9 +169,9 @@ public class ToDoMainFragment extends ListFragment
                         (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
                 Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" +
-                        ToDoApplication.getCurrentUserId() + "/localId/" + info.id);
+                        getProjectId() + "/toDoId/" + info.id);
                 getActivity().getContentResolver().delete(uri, null, null);
-                fillData();
+
 
                 return true;
             default:
@@ -168,7 +183,7 @@ public class ToDoMainFragment extends ListFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_main_fragment, menu);
 
 
     }
@@ -181,27 +196,15 @@ public class ToDoMainFragment extends ListFragment
 
             case R.id.menu_main_new_toDo:
 
-                createToDo(null);
+                createToDo(Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + getProjectId()));
                 return true;
 
             case R.id.menu_main_sync:
 
-                ((TodoMainActivity) getActivity()).synchronizeWithServer();
-                return true;
-
-            case R.id.menu_main_sign_out:
-
-                // keep track of time user was last log in in order to effectively fetch data later
-                // from server's database
-                ToDoApplication.setLastUserSessionDate(System.currentTimeMillis());
-
-                ParseUser.logOut();
-
-                Intent i = new Intent(getActivity(), DispatchActivity.class);
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(i);
-                getActivity().finish();
-
+                TodoMainActivity activity = ((TodoMainActivity) getActivity());
+                if (activity != null) {
+                    activity.synchronizeWithServer();
+                }
                 return true;
 
             default:
@@ -230,21 +233,18 @@ public class ToDoMainFragment extends ListFragment
 
         // put Uri that refers to the id of the item, it's type is TodoContentProvider.CONTENT_ITEM_TYPE
         Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI +
-                "/" + ToDoApplication.getCurrentUserId() +
-                "/localId/" + id);
+                "/" + getProjectId() +
+                "/toDoId/" + id);
         createToDo(uri);
     }
 
 
     private void fillData() {
 
-//        String[] from = new String[]{TodoTable.COLUMN_SUMMARY};
-//
-//        int[] to = new int[]{R.id.row_textView};
-//
-        getLoaderManager().initLoader(0, null, this);
+        Bundle args = getArguments();
 
-//        mCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.todo_row_layout, null, from, to, 0);
+        getLoaderManager().initLoader(0, args, this);
+
 
         mCursorAdapter = new ToDoCursorAdapter(getActivity());
 
@@ -252,8 +252,11 @@ public class ToDoMainFragment extends ListFragment
     }
 
 
+    //****************************                Loader Logic                ******************************************
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        long projectId = args.getLong(KEY_PROJECT_ID);
 
         String[] projection = new String[]{
                 TodoTable.COLUMN_ID, TodoTable.COLUMN_SUMMARY, TodoTable.COLUMN_CATEGORY
@@ -261,7 +264,7 @@ public class ToDoMainFragment extends ListFragment
 
         CursorLoader cursorLoader = new CursorLoader(
                 getActivity(),
-                Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + ToDoApplication.getCurrentUserId()),
+                Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + projectId),
                 projection,
                 null,
                 null,
@@ -280,6 +283,7 @@ public class ToDoMainFragment extends ListFragment
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
     }
+    //******************************************************************************************************************
 
 
     @Override
@@ -344,6 +348,10 @@ public class ToDoMainFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
+    }
+
+    public long getProjectId() {
+        return mProjectId;
     }
 
     /**

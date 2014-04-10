@@ -10,17 +10,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.*;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
 import com.oyster.DBandContentProviderEx.services.ToDoParseUploadService;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoDetailFragment;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
+import com.parse.ParseUser;
 
 public class TodoMainActivity extends NavigationDrawerBaseActivity
         implements ToDoDetailFragment.OnSuicideListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -29,7 +28,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     public static final String TAG_DETAIL_FRAGMENT = "detail_fragment";
 
     private ProjectCursorAdapter mProjectCursorAdapter;
-    private ListView mNavigationDrowerListView;
+    private ListView mNavigationDrawerListView;
 
 
     public int getFragmentContainerId() {
@@ -50,13 +49,16 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
         // upload all projects
         getLoaderManager().initLoader(47, null, this);
+    }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void init() {
 
-        if (getFragmentContainerId() == R.id.navigation_drawer_fragment_container) {
+        /*if (getFragmentContainerId() == R.id.navigation_drawer_fragment_container) {
             FragmentManager fm = getFragmentManager();
             Fragment fragment = fm.findFragmentById(R.id.navigation_drawer_fragment_container);
             if (fragment == null) {
@@ -64,19 +66,37 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                         .add(getFragmentContainerId(), createFragment())
                         .commit();
             }
-        }
+        }*/
 
-        mNavigationDrowerListView = (ListView) findViewById(R.id.navigation_drawer_left_layout);
+        mNavigationDrawerListView = (ListView) findViewById(R.id.navigation_drawer_left_layout);
 
         mProjectCursorAdapter = new ProjectCursorAdapter(this);
-        mNavigationDrowerListView.setAdapter(mProjectCursorAdapter);
+        mNavigationDrawerListView.setAdapter(mProjectCursorAdapter);
+
+        mNavigationDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                FragmentManager fm = getFragmentManager();
+                while (fm.popBackStackImmediate()) ;
+
+                fm.beginTransaction()
+
+                        .replace(getFragmentContainerId(), ToDoMainFragment.newInstance(id), TAG_DETAIL_FRAGMENT)
+                        .commit();
+
+                closeAllDrawers();
+            }
+        });
+
+        mNavigationDrawerListView.callOnClick();
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_activity, menu);
         return true;
     }
 
@@ -87,6 +107,22 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             case R.id.menu_main_new_project:
 
                 showNewProjectDialog();
+                return true;
+
+
+            case R.id.menu_main_sign_out:
+
+                // keep track of time user was last log in in order to effectively fetch data later
+                // from server's database
+                ToDoApplication.setLastUserSessionDate(System.currentTimeMillis());
+
+                ParseUser.logOut();
+
+                Intent i = new Intent(this, DispatchActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
+                this.finish();
+
                 return true;
 
             default:
@@ -110,6 +146,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         });
 
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @SuppressWarnings("ConstantConditions")
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -258,6 +295,8 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             holder.mTextViewDesc.setText(cursor.getString(
                     cursor.getColumnIndexOrThrow(ProjectTable.COLUMN_DESCRIPTION)));
         }
+
+
     }
 
 }

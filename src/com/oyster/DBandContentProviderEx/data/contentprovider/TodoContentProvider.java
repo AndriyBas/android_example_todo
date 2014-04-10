@@ -77,12 +77,14 @@ public class TodoContentProvider extends ContentProvider {
 
         SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
 
-        checkColumns(projection);
 
         int uriType = sUriMather.match(uri);
         switch (uriType) {
 
             case TODOS_PROJECT:
+
+                checkColumns(projection, TodoTable.AVAILABLE_COLUMNS);
+
                 // search in TodoTable
                 sqLiteQueryBuilder.setTables(TodoTable.TABLE_NAME);
 
@@ -91,6 +93,8 @@ public class TodoContentProvider extends ContentProvider {
                 break;
 
             case TODOS_PROJECT_toDoId:
+
+                checkColumns(projection, TodoTable.AVAILABLE_COLUMNS);
 
                 // also search in TodoTable
                 sqLiteQueryBuilder.setTables(TodoTable.TABLE_NAME);
@@ -101,6 +105,9 @@ public class TodoContentProvider extends ContentProvider {
                 break;
 
             case PROJECTS:
+
+                checkColumns(projection, ProjectTable.AVAILABLE_COLUMNS);
+
                 // search in ProjectTable
                 sqLiteQueryBuilder.setTables(ProjectTable.TABLE_NAME);
 
@@ -109,6 +116,9 @@ public class TodoContentProvider extends ContentProvider {
                 break;
 
             case PROJECTS_projectId:
+
+                checkColumns(projection, ProjectTable.AVAILABLE_COLUMNS);
+
                 // search in ProjectTable
                 sqLiteQueryBuilder.setTables(ProjectTable.TABLE_NAME);
 
@@ -174,9 +184,9 @@ public class TodoContentProvider extends ContentProvider {
 
                 values.put(TodoTable.COLUMN_ID, id);
                 values.put(TodoTable.COLUMN_UPDATED_AT, System.currentTimeMillis());
-                values.put(TodoTable.COLUMN_PROJECT_ID, Integer.parseInt(uri.getLastPathSegment()));
+                values.put(TodoTable.COLUMN_PROJECT_ID, Long.parseLong(uri.getLastPathSegment()));
 
-                id = sqLiteDatabase.insert(ProjectTable.TABLE_NAME, null, values);
+                id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
                 resUri = Uri.parse(uri + "/toDoId/" + id);
                 Log.i("ololo", "id after insert : " + id);
 //                runProjectService(ProjectParseUploadService.ACTION_INSERT, Uri.parse(uri + "/localId/" + id));
@@ -202,17 +212,11 @@ public class TodoContentProvider extends ContentProvider {
 
         int rowsDeleted = 0;
 
-        /*
-        String parseIdToDelete = null;
 
         switch (uriType) {
 
             case TODOS_PROJECT_toDoId:
                 String id = uri.getLastPathSegment();
-
-                Cursor c = query(uri, new String[]{TodoTable.COLUMN_PARSE_ID}, null, null, null);
-                c.moveToFirst();
-                parseIdToDelete = c.getString(c.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID));
 
 //                if (TextUtils.isEmpty(selection)) {
                 rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
@@ -223,15 +227,15 @@ public class TodoContentProvider extends ContentProvider {
 //                }
 
 
-                Intent i = new Intent(ToDoParseUploadService.ACTION_DELETE, uri, getContext(), ToDoParseUploadService.class);
-                i.putExtra(ToDoParseUploadService.KEY_PARSE_ID, parseIdToDelete);
-                getContext().startService(i);
+//                Intent i = new Intent(ToDoParseUploadService.ACTION_DELETE, uri, getContext(), ToDoParseUploadService.class);
+//                i.putExtra(ToDoParseUploadService.KEY_PARSE_ID, parseIdToDelete);
+//                getContext().startService(i);
 
 
                 break;
 
             // this better not be called
-            case TODOS_PROJECT:
+//            case PROJECTS_projectId:
 //                String userId = uri.getLastPathSegment();
 //                if (TextUtils.isEmpty(selection)) {
 //                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
@@ -242,7 +246,6 @@ public class TodoContentProvider extends ContentProvider {
 //                }
 //                break;
 
-                throwEx(uri);
             default:
                 throwEx(uri);
         }
@@ -250,7 +253,6 @@ public class TodoContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
 
 
-        */
         return rowsDeleted;
     }
 
@@ -271,51 +273,31 @@ public class TodoContentProvider extends ContentProvider {
 
         int rowsUpdated = 0;
 
-        /*
+
         switch (uriType) {
 
-            // better not call this
-            case TODOS_PROJECT:
-
-
-//                String userId = uri.getLastPathSegment();
-//
-//                if (TextUtils.isEmpty(selection)
-//                        || !selection.contains(TodoTable.COLUMN_USER_ID)) {
-//                    selection = TodoTable.COLUMN_USER_ID + "='" + userId + "'";
-//                }
-//
-//                rowsUpdated = sqLiteDatabase.update(
-//                        TodoTable.TABLE_NAME,
-//                        values,
-//                        selection,
-//                        selectionArgs);
-//                break;
-
-                throwEx(uri);
-
             case TODOS_PROJECT_toDoId:
-                String id = uri.getLastPathSegment();
+
+                String toDoId = uri.getLastPathSegment();
                 rowsUpdated = sqLiteDatabase.update(
                         TodoTable.TABLE_NAME,
                         values,
-                        TodoTable.COLUMN_ID + "=" + id,
+                        TodoTable.COLUMN_ID + "=" + toDoId,
                         null);
 
-                runToDoService(ToDoParseUploadService.ACTION_UPDATE, uri);
+//                runToDoService(ToDoParseUploadService.ACTION_UPDATE, uri);
 
                 break;
 
-            case TODOS_USER_parseToDoID:
-                String parseId = uri.getLastPathSegment();
+            case PROJECTS_projectId:
+
+                String projectId = uri.getLastPathSegment();
+
                 rowsUpdated = sqLiteDatabase.update(
-                        TodoTable.TABLE_NAME,
+                        ProjectTable.TABLE_NAME,
                         values,
-                        TodoTable.COLUMN_PARSE_ID + "='" + parseId + "'",
+                        ProjectTable.COLUMN_ID + "=" + projectId,
                         null);
-
-                Log.i("ololo_", "id : " + parseId + ",   rows updated : " + rowsUpdated);
-
                 break;
 
             default:
@@ -324,10 +306,13 @@ public class TodoContentProvider extends ContentProvider {
 
         getContext().getContentResolver().notifyChange(uri, null);
 
-*/
         return rowsUpdated;
     }
 
+
+    public static boolean matchTODOS_PROJECT(Uri uri) {
+        return sUriMather.match(uri) == TODOS_PROJECT;
+    }
 
     /**
      * Check if projection contains only columns that are in the database
@@ -335,10 +320,10 @@ public class TodoContentProvider extends ContentProvider {
      * @param projection Array of requested columns
      * @throws java.lang.IllegalArgumentException on failure
      */
-    private void checkColumns(String[] projection) {
+    private void checkColumns(String[] projection, String[] columns) {
         if (projection != null) {
             HashSet<String> requestColumns = new HashSet<String>(Arrays.asList(projection));
-            HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(TodoTable.AVAILABLE_COLUMNS));
+            HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(columns));
             if (!availableColumns.containsAll(requestColumns)) {
                 throw new IllegalArgumentException("Unknown columns in projection");
             }
@@ -355,4 +340,5 @@ public class TodoContentProvider extends ContentProvider {
         getContext().startService(i);
         //*********************************************
     }
+
 }

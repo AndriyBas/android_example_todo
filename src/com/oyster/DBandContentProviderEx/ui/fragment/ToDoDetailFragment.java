@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
-import com.oyster.DBandContentProviderEx.ToDoApplication;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.parse.ToDo;
@@ -129,6 +128,10 @@ public class ToDoDetailFragment extends Fragment {
 
     private void fillData(Uri todoUri) {
 
+        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
+            return;
+        }
+
         String[] projection = new String[]{
                 TodoTable.COLUMN_SUMMARY,
                 TodoTable.COLUMN_DESCRIPTION,
@@ -202,6 +205,8 @@ public class ToDoDetailFragment extends Fragment {
         if (mEditTextDescription != null) {
             hideSoftKeyboard(mEditTextDescription);
         }
+
+
         super.onPause();
     }
 
@@ -220,14 +225,13 @@ public class ToDoDetailFragment extends Fragment {
         values.put(TodoTable.COLUMN_CATEGORY, category);
         values.put(TodoTable.COLUMN_DESCRIPTION, description);
         values.put(TodoTable.COLUMN_SUMMARY, summary);
-        values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
 
-        if (todoUri == null) {
+        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
 
-            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI +
-                    "/" + ToDoApplication.getCurrentUserId());
+//            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI
+//                    + getArguments().getLo "/toDoId/" + ToDoApplication.getCurrentUserId());
 
-            todoUri = getActivity().getContentResolver().insert(currentUri, values);
+            todoUri = getActivity().getContentResolver().insert(todoUri, values);
 
         } else {
             getActivity().getContentResolver().update(todoUri, values, null, null);
@@ -242,7 +246,7 @@ public class ToDoDetailFragment extends Fragment {
     private int deleteData() {
 
 
-        if (todoUri == null) {
+        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
             return 0;
         }
 
