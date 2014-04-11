@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.oyster.DBandContentProviderEx.data.database.TodoDatabaseHelper;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @author bamboo
  * @since 4/11/14 5:10 PM
  */
-public class ToDo {
+public class ToDo implements Serializable {
 
     private long mId = -1;
     private long mProjectId = -1;

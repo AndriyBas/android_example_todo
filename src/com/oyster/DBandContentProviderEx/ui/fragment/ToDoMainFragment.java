@@ -16,6 +16,7 @@ import android.view.*;
 import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.Category;
+import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
@@ -128,15 +129,14 @@ public class ToDoMainFragment extends ListFragment
                             for (int i = 0; i < adapter.getCount(); i++) {
 
                                 if (listView.isItemChecked(i)) {
-                                    Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI
-                                            + "/" + getProjectId()
-                                            + "/toDoId/" + listView.getItemIdAtPosition(i));
-                                    getActivity().getContentResolver().delete(uri, null, null);
+                                    ToDo.getById(listView.getItemIdAtPosition(i))
+                                            .delete();
                                 }
                             }
 
                             mode.finish();
                             adapter.notifyDataSetChanged();
+                            getLoaderManager().restartLoader(0, null, ToDoMainFragment.this);
                             return true;
 
                         default:
@@ -168,10 +168,9 @@ public class ToDoMainFragment extends ListFragment
                 AdapterView.AdapterContextMenuInfo info =
                         (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-                Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" +
-                        getProjectId() + "/toDoId/" + info.id);
-                getActivity().getContentResolver().delete(uri, null, null);
-
+                ToDo.getById(info.id)
+                        .delete();
+                getLoaderManager().restartLoader(0, null, this);
 
                 return true;
             default:
@@ -196,7 +195,9 @@ public class ToDoMainFragment extends ListFragment
 
             case R.id.menu_main_new_toDo:
 
-                createToDo(Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + getProjectId()));
+                ToDo toDo = new ToDo();
+                toDo.setProjectId(getProjectId());
+                createToDo(toDo);
                 return true;
 
             case R.id.menu_main_sync:
@@ -215,10 +216,10 @@ public class ToDoMainFragment extends ListFragment
     }
 
 
-    public void createToDo(Uri uri) {
+    public void createToDo(ToDo toDo) {
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(uri,
+        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
                 (ToDoDetailFragment.OnSuicideListener) getActivity());
         transaction.replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
                 fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT);
@@ -231,11 +232,7 @@ public class ToDoMainFragment extends ListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        // put Uri that refers to the id of the item, it's type is TodoContentProvider.CONTENT_ITEM_TYPE
-        Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI +
-                "/" + getProjectId() +
-                "/toDoId/" + id);
-        createToDo(uri);
+        createToDo(ToDo.getById(id));
     }
 
 

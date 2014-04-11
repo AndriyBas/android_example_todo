@@ -2,11 +2,8 @@ package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,9 +15,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.Category;
-import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
-import com.oyster.DBandContentProviderEx.data.parse.ParseToDo;
-import com.oyster.DBandContentProviderEx.data.table.TodoTable;
+import com.oyster.DBandContentProviderEx.data.ToDo;
 
 import java.util.ArrayList;
 
@@ -30,16 +25,14 @@ import java.util.ArrayList;
  */
 public class ToDoDetailFragment extends Fragment {
 
-    private ParseToDo mTodo;
-
-    private Uri todoUri;
+    private ToDo mToDo;
 
     private EditText mEditTextSummary;
     private EditText mEditTextDescription;
     private Spinner mSpinnerCategory;
     private ArrayList<String> categories;
 
-    private static final String KEY_TODO_URI = "com.oyster.todo_uri";
+    private static final String KEY_TOD0 = "com.oyster.todo";
 
 //    private OnSuicideListener mOnSuicideListener;
 
@@ -60,16 +53,18 @@ public class ToDoDetailFragment extends Fragment {
 
     private Boolean mToDoChanged = false;
 
-    public static ToDoDetailFragment newInstance(Uri uri, OnSuicideListener listener) {
+    public static ToDoDetailFragment newInstance(ToDo toDo, OnSuicideListener listener) {
 
         ToDoDetailFragment fragment = new ToDoDetailFragment();
 //        fragment.setOnSuicideListener(listener);
 
-        if (uri != null) {
-            Bundle args = new Bundle();
-            args.putParcelable(KEY_TODO_URI, uri);
-            fragment.setArguments(args);
+        if (toDo == null) {
+            toDo = new ToDo();
         }
+
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_TOD0, toDo);
+        fragment.setArguments(args);
 
         return fragment;
     }
@@ -83,6 +78,8 @@ public class ToDoDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+
+
     }
 
 
@@ -95,9 +92,10 @@ public class ToDoDetailFragment extends Fragment {
         Bundle args = getArguments();
 
         if (args != null) {
-            todoUri = (Uri) args.getParcelable(KEY_TODO_URI);
-            fillData(todoUri);
+            mToDo = (ToDo) args.getSerializable(KEY_TOD0);
+            fillData();
         }
+
         return v;
     }
 
@@ -126,63 +124,18 @@ public class ToDoDetailFragment extends Fragment {
     }
 
 
-    private void fillData(Uri todoUri) {
+    private void fillData() {
 
-        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
-            return;
-        }
+        mEditTextSummary.setText(mToDo.getSummary());
+        mEditTextDescription.setText(mToDo.getDescription());
+        String category = mToDo.getCategory().toString();
 
-        String[] projection = new String[]{
-                TodoTable.COLUMN_SUMMARY,
-                TodoTable.COLUMN_DESCRIPTION,
-                TodoTable.COLUMN_CATEGORY
-        };
-
-        Cursor cursor = getActivity().getContentResolver().query(
-                todoUri,
-                projection,
-                null,
-                null,
-                null);
-
-        if (cursor != null) {
-
-            cursor.moveToFirst();
-
-            if (!cursor.isAfterLast()) {
-
-
-                String category = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_CATEGORY));
-
-                String summary = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY));
-
-                String description = cursor.getString(
-                        cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION));
-
-
-                mEditTextSummary.setText(summary);
-                mEditTextDescription.setText(description);
-
-                for (int i = 0; i < mSpinnerCategory.getCount(); i++) {
-                    if (category.equals(mSpinnerCategory.getItemAtPosition(i))) {
-                        mSpinnerCategory.setSelection(i);
-                        break;
-                    }
-                }
-
-                if (mTodo == null) {
-                    mTodo = new ParseToDo(
-                            summary,
-                            description,
-                            Category.valueOf(category));
-                }
+        for (int i = 0; i < mSpinnerCategory.getCount(); i++) {
+            if (category.equals(mSpinnerCategory.getItemAtPosition(i))) {
+                mSpinnerCategory.setSelection(i);
+                break;
             }
-
-            cursor.close();
         }
-
     }
 
     @Override
@@ -216,26 +169,11 @@ public class ToDoDetailFragment extends Fragment {
         String summary = mEditTextSummary.getText().toString();
         String description = mEditTextDescription.getText().toString();
 
-        if (summary.trim().length() == 0) {
-            return false;
-        }
+        mToDo.setSummary(summary);
+        mToDo.setDescription(description);
+        mToDo.setCategory(Category.valueOf(category));
 
-        ContentValues values = new ContentValues();
-
-        values.put(TodoTable.COLUMN_CATEGORY, category);
-        values.put(TodoTable.COLUMN_DESCRIPTION, description);
-        values.put(TodoTable.COLUMN_SUMMARY, summary);
-
-        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
-
-//            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI
-//                    + getArguments().getLo "/toDoId/" + ToDoApp.getCurrentUserId());
-
-            todoUri = getActivity().getContentResolver().insert(todoUri, values);
-
-        } else {
-            getActivity().getContentResolver().update(todoUri, values, null, null);
-        }
+        mToDo.save();
 
         mToDoChanged = false;
 
@@ -243,16 +181,8 @@ public class ToDoDetailFragment extends Fragment {
     }
 
 
-    private int deleteData() {
-
-
-        if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
-            return 0;
-        }
-
-        int rowsDeleted = getActivity().getContentResolver().delete(todoUri, null, null);
-
-        return rowsDeleted;
+    private void deleteData() {
+        mToDo.delete();
     }
 
     private void showDeleteConfirmationDialog() {
