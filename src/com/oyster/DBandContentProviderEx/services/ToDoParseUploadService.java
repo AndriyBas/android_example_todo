@@ -144,6 +144,7 @@ public class ToDoParseUploadService extends IntentService {
 
     private void updateData(Intent intent) {
 
+/*
         final Uri toDoUri = intent.getData();
 
         final Cursor cursor = fetchCursor(toDoUri);
@@ -164,6 +165,7 @@ public class ToDoParseUploadService extends IntentService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+*/
 
     }
 
@@ -220,7 +222,7 @@ public class ToDoParseUploadService extends IntentService {
     }
 
     private void updateParseIdLocally(Uri toDoUri, ParseToDo parseToDo) {
-
+/*
         ContentValues values = new ContentValues();
         values.put(TodoTable.COLUMN_PARSE_ID, parseToDo.getObjectId());
         getContentResolver().update(
@@ -228,6 +230,7 @@ public class ToDoParseUploadService extends IntentService {
                 values,  // ContentValues
                 null,    // String where
                 null);   // String[] selectionArgs
+*/
     }
 
     private void deleteData(Intent intent) {
@@ -314,8 +317,8 @@ public class ToDoParseUploadService extends IntentService {
                         null, // String where
                         null);  // String[] selectionArgs
             } else {
-                values.put(TodoTable.COLUMN_PARSE_ID, t.getObjectId());
-                getContentResolver().insert(toDoUri, values);
+//                values.put(TodoTable.COLUMN_PARSE_ID, t.getObjectId());
+//                getContentResolver().insert(toDoUri, values);
             }
             c.close();
         }

@@ -6,16 +6,15 @@ import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.*;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.ToDoApp;
+import com.oyster.DBandContentProviderEx.data.Project;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
-import com.oyster.DBandContentProviderEx.services.ToDoParseUploadService;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoDetailFragment;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
@@ -163,14 +162,14 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                     return;
                 }
 
-                ContentValues values = new ContentValues();
-                values.put(ProjectTable.COLUMN_SUMMARY, summary);
-                values.put(ProjectTable.COLUMN_DESCRIPTION, desc);
+                Project p = new Project();
+                p.setSummary(summary);
+                p.setDescription(desc);
 
-                Uri uri = TodoContentProvider.CONTENT_PROJECT_URI;
+                p.save();
 
-                getContentResolver().insert(uri, values);
-
+                // WTF - how about performance
+                getLoaderManager().restartLoader(0, null, TodoMainActivity.this);
             }
         });
 
@@ -207,12 +206,12 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
     public void synchronizeWithServer() {
         // synchronize with server
-        Intent i = new Intent(
-                ToDoParseUploadService.ACTION_FETCH_NEW_ITEMS, // action
-                null,                                          // uri
-                this,                                 // context
-                ToDoParseUploadService.class);                 // Service
-        startService(i);
+//        Intent i = new Intent(
+//                ToDoParseUploadService.ACTION_FETCH_NEW_ITEMS, // action
+//                null,                                          // uri
+//                this,                                 // context
+//                ToDoParseUploadService.class);                 // Service
+//        startService(i);
     }
 
     @Override
