@@ -129,14 +129,13 @@ public class ToDoMainFragment extends ListFragment
                             for (int i = 0; i < adapter.getCount(); i++) {
 
                                 if (listView.isItemChecked(i)) {
-                                    ToDo.getById(listView.getItemIdAtPosition(i))
+                                    ToDo.getById(getProjectId(), listView.getItemIdAtPosition(i))
                                             .delete();
                                 }
                             }
 
                             mode.finish();
                             adapter.notifyDataSetChanged();
-                            getLoaderManager().restartLoader(0, null, ToDoMainFragment.this);
                             return true;
 
                         default:
@@ -168,10 +167,8 @@ public class ToDoMainFragment extends ListFragment
                 AdapterView.AdapterContextMenuInfo info =
                         (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
 
-                ToDo.getById(info.id)
+                ToDo.getById(getProjectId(), info.id)
                         .delete();
-                getLoaderManager().restartLoader(0, null, this);
-
                 return true;
             default:
                 return
@@ -195,9 +192,7 @@ public class ToDoMainFragment extends ListFragment
 
             case R.id.menu_main_new_toDo:
 
-                ToDo toDo = new ToDo();
-                toDo.setProjectId(getProjectId());
-                createToDo(toDo);
+                createToDo(null);
                 return true;
 
             case R.id.menu_main_sync:
@@ -218,6 +213,11 @@ public class ToDoMainFragment extends ListFragment
 
     public void createToDo(ToDo toDo) {
 
+        if (toDo == null) {
+            toDo = new ToDo();
+        }
+        toDo.setProjectId(getProjectId());
+
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
                 (ToDoDetailFragment.OnSuicideListener) getActivity());
@@ -232,7 +232,7 @@ public class ToDoMainFragment extends ListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        createToDo(ToDo.getById(id));
+        createToDo(ToDo.getById(getProjectId(), id));
     }
 
 

@@ -168,8 +168,6 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
                 p.save();
 
-                // WTF - how about performance
-                getLoaderManager().restartLoader(0, null, TodoMainActivity.this);
             }
         });
 

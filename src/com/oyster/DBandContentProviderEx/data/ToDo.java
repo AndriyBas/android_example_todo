@@ -2,9 +2,10 @@ package com.oyster.DBandContentProviderEx.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import com.oyster.DBandContentProviderEx.data.database.TodoDatabaseHelper;
+import android.net.Uri;
+import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
+import com.oyster.DBandContentProviderEx.utils.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -90,19 +91,18 @@ public class ToDo implements Serializable {
      * @param id
      * @return
      */
-    public static ToDo getById(long id) {
+    public static ToDo getById(long projectId, long id) {
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getReadableDatabase();
-        assert sqLiteDB != null;
 
-        Cursor c = sqLiteDB.query(
-                TodoTable.TABLE_NAME,               // TableName
-                null,                               // String[] projection
-                TodoTable.COLUMN_ID + "= ?",        // String selection
-                new String[]{String.valueOf(id)},  // String[] selectionArgs
-                null,                               // String groupBy
-                null,                               // String having
-                null);                              // String sortOrder
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + projectId + "/toDoId/" + id);
+
+        Cursor c = Utils.getAppContext().getContentResolver().query(
+                uri,  // Uri
+                null, // projection
+                null, // selection
+                null, // selectionArgs
+                null  // sortOrder
+        );
 
         if (c == null) {
             return null;
@@ -127,17 +127,15 @@ public class ToDo implements Serializable {
      */
     public static List<ToDo> getByProjectId(long projectId) {
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getReadableDatabase();
-        assert sqLiteDB != null;
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + projectId);
 
-        Cursor c = sqLiteDB.query(
-                TodoTable.TABLE_NAME,                       // TableName
-                null,                                       // String[] projection
-                TodoTable.COLUMN_PROJECT_ID + "= ?",        // String selection
-                new String[]{String.valueOf(projectId)},    // String[] selectionArgs
-                null,                                       // String groupBy
-                null,                                       // String having
-                TodoTable.COLUMN_UPDATED_AT + " asc");
+        Cursor c = Utils.getAppContext().getContentResolver().query(
+                uri,  // Uri
+                null, // projection
+                null, // selection
+                null, // selectionArgs
+                null  // sortOrder
+        );
 
         ArrayList<ToDo> toDos = new ArrayList<ToDo>();
 
@@ -162,21 +160,21 @@ public class ToDo implements Serializable {
 
         onUpdated();
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getWritableDatabase();
-        assert sqLiteDB != null;
-
         if (getId() == -1) {
-            long id = sqLiteDB.insert(
-                    TodoTable.TABLE_NAME,  // String tableName
-                    null,                  // String nullColumnHuck
-                    toContentValues());    // ContentValues
-            setId(id);
+
+            Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + getProjectId());
+            Uri resUri = Utils.getAppContext().getContentResolver().insert(uri, toContentValues());
+            setId(Long.parseLong(resUri.getLastPathSegment()));
+
         } else {
-            sqLiteDB.update(
-                    TodoTable.TABLE_NAME,                       // String tableName
-                    toContentValues(),                          // ContentValues
-                    TodoTable.COLUMN_ID + "= ?",                // String selection
-                    new String[]{String.valueOf(getId())}       // String[] selectionArgs
+
+            Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + getProjectId() + "/toDoId/" + getId());
+
+            Utils.getAppContext().getContentResolver().update(
+                    uri,                // Uri
+                    toContentValues(),  // ContentValues
+                    null,               // selection
+                    null                // selectionArgs
             );
         }
     }
@@ -193,13 +191,12 @@ public class ToDo implements Serializable {
             return;
         }
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getWritableDatabase();
-        assert sqLiteDB != null;
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/" + getProjectId() + "/toDoId/" + getId());
 
-        sqLiteDB.delete(
-                TodoTable.TABLE_NAME,                   // String tableName
-                TodoTable.COLUMN_ID + "= ?",            // String selection
-                new String[]{String.valueOf(getId())}   // String[] selectionArgs
+        Utils.getAppContext().getContentResolver().delete(
+                uri,   // Uri
+                null,  // selection
+                null   // selectionArgs
         );
     }
 

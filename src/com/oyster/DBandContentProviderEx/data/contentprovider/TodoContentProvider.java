@@ -171,11 +171,10 @@ public class TodoContentProvider extends ContentProvider {
             case PROJECTS:
 
                 values.put(ProjectTable.COLUMN_ID, id);
-                values.put(ProjectTable.COLUMN_UPDATED_AT, System.currentTimeMillis());
 
                 id = sqLiteDatabase.insert(ProjectTable.TABLE_NAME, null, values);
                 resUri = Uri.parse(uri + "/" + id);
-                Log.i("ololo", "id after insert : " + id);
+                Log.i("ololo proj", "id after insert : " + id);
 
 //                runToDoService(ToDoParseUploadService.ACTION_INSERT, Uri.parse(uri + "/localId/" + id));
                 break;
@@ -183,8 +182,7 @@ public class TodoContentProvider extends ContentProvider {
             case TODOS_PROJECT:
 
                 values.put(TodoTable.COLUMN_ID, id);
-                values.put(TodoTable.COLUMN_UPDATED_AT, System.currentTimeMillis());
-                values.put(TodoTable.COLUMN_PROJECT_ID, Long.parseLong(uri.getLastPathSegment()));
+//                values.put(TodoTable.COLUMN_PROJECT_ID, Long.parseLong(uri.getLastPathSegment()));
 
                 id = sqLiteDatabase.insert(TodoTable.TABLE_NAME, null, values);
                 resUri = Uri.parse(uri + "/toDoId/" + id);

@@ -2,9 +2,13 @@ package com.oyster.DBandContentProviderEx.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import com.oyster.DBandContentProviderEx.data.database.TodoDatabaseHelper;
+import android.net.Uri;
+import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
+import com.oyster.DBandContentProviderEx.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bamboo
@@ -15,13 +19,13 @@ public class Project {
     private long mId = -1;
     private String mSummary = "";
     private String mDescription = "";
-    private Category mCategory = Category.Remainder;
+    private String mCategory = "";
     private long mUpdatedAt = 0;
 
     public Project() {
     }
 
-    public Project(long id, String summary, String description, Category category) {
+    public Project(long id, String summary, String description, String category) {
         this();
         mId = id;
         mSummary = summary;
@@ -29,7 +33,7 @@ public class Project {
         mCategory = category;
     }
 
-    public Project(long id, String summary, String description, Category category, long updatedAt) {
+    public Project(long id, String summary, String description, String category, long updatedAt) {
         this(id, summary, description, category);
         mUpdatedAt = updatedAt;
     }
@@ -50,7 +54,7 @@ public class Project {
                 c.getLong(c.getColumnIndexOrThrow(ProjectTable.COLUMN_ID)),
                 c.getString(c.getColumnIndexOrThrow(ProjectTable.COLUMN_SUMMARY)),
                 c.getString(c.getColumnIndexOrThrow(ProjectTable.COLUMN_DESCRIPTION)),
-                Category.valueOf(c.getString(c.getColumnIndexOrThrow(ProjectTable.COLUMN_CATEGORY))),
+                c.getString(c.getColumnIndexOrThrow(ProjectTable.COLUMN_CATEGORY)),
                 c.getLong(c.getColumnIndexOrThrow(ProjectTable.COLUMN_UPDATED_AT))
         );
 
@@ -65,77 +69,108 @@ public class Project {
     private ContentValues toContentValues() {
         ContentValues values = new ContentValues();
 
+//        if (getId() != -1) {
+//            values.put(ProjectTable.COLUMN_ID, getId());
+//        }
         values.put(ProjectTable.COLUMN_SUMMARY, getSummary());
         values.put(ProjectTable.COLUMN_DESCRIPTION, getDescription());
-        values.put(ProjectTable.COLUMN_CATEGORY, getCategory().toString());
+        values.put(ProjectTable.COLUMN_CATEGORY, getCategory());
         values.put(ProjectTable.COLUMN_UPDATED_AT, getUpdatedAt());
 
         return values;
     }
 
     /**
-     * find Project by it's id in the database
+     * find cursor by it's id in the database
      *
-     * @param id
      * @return
      */
-    public static Project getById(long id) {
+    public static Project getProjectById(long projectId) {
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getReadableDatabase();
-        assert sqLiteDB != null;
 
-        Cursor c = sqLiteDB.query(
-                ProjectTable.TABLE_NAME,               // TableName
-                null,                               // String[] projection
-                ProjectTable.COLUMN_ID + "= ?",        // String selection
-                new String[]{String.valueOf(id)},  // String[] selectionArgs
-                null,                               // String groupBy
-                null,                               // String having
-                null);                              // String sortOrder
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_PROJECT_URI + "/" + projectId);
+
+        Cursor c = Utils.getAppContext().getContentResolver().query(
+                uri,  // Uri
+                null, // projection
+                null, // selection
+                null, // selectionArgs
+                null  // sortOrder
+        );
 
         if (c == null) {
             return null;
         }
-
         c.moveToFirst();
 
         if (c.isBeforeFirst() || c.isAfterLast()) {
             return null;
         }
 
-
         return fromCursor(c);
+
     }
 
 
     /**
-     * saves current Project to the database, or updates if it was saved before
+     * @return
+     */
+    public static List<Project> getAllProjects() {
+
+        Uri uri = TodoContentProvider.CONTENT_PROJECT_URI;
+
+        Cursor c = Utils.getAppContext().getContentResolver().query(
+                uri,  // Uri
+                null, // projection
+                null, // selection
+                null, // selectionArgs
+                null  // sortOrder
+        );
+
+        ArrayList<Project> projects = new ArrayList<Project>();
+
+        if (c == null) {
+            return projects;
+        }
+
+        c.moveToFirst();
+
+        while (!c.isAfterLast()) {
+            projects.add(fromCursor(c));
+            c.moveToNext();
+        }
+
+        return projects;
+    }
+
+    /**
+     * saves current _Project to the database, or updates if it was saved before
      */
     public void save() {
 
         onUpdated();
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getWritableDatabase();
-        assert sqLiteDB != null;
-
         if (getId() == -1) {
-            long id = sqLiteDB.insert(
-                    ProjectTable.TABLE_NAME,  // String tableName
-                    null,                  // String nullColumnHuck
-                    toContentValues());    // ContentValues
-            setId(id);
+
+            Uri uri = TodoContentProvider.CONTENT_PROJECT_URI;
+            Uri resUri = Utils.getAppContext().getContentResolver().insert(uri, toContentValues());
+            setId(Long.parseLong(resUri.getLastPathSegment()));
+
         } else {
-            sqLiteDB.update(
-                    ProjectTable.TABLE_NAME,                       // String tableName
-                    toContentValues(),                          // ContentValues
-                    ProjectTable.COLUMN_ID + "= ?",                // String selection
-                    new String[]{String.valueOf(getId())}       // String[] selectionArgs
+
+            Uri uri = Uri.parse(TodoContentProvider.CONTENT_PROJECT_URI + "/" + getId());
+
+            Utils.getAppContext().getContentResolver().update(
+                    uri,                // Uri
+                    toContentValues(),  // ContentValues
+                    null,               // selection
+                    null                // selectionArgs
             );
         }
     }
 
     /**
-     * deletes the Project from the database
+     * deletes the _Project from the database
      */
     public void delete() {
 
@@ -146,13 +181,12 @@ public class Project {
             return;
         }
 
-        SQLiteDatabase sqLiteDB = TodoDatabaseHelper.getInstance().getWritableDatabase();
-        assert sqLiteDB != null;
+        Uri uri = Uri.parse(TodoContentProvider.CONTENT_PROJECT_URI + "/" + getId());
 
-        sqLiteDB.delete(
-                ProjectTable.TABLE_NAME,                   // String tableName
-                ProjectTable.COLUMN_ID + "= ?",            // String selection
-                new String[]{String.valueOf(getId())}   // String[] selectionArgs
+        Utils.getAppContext().getContentResolver().delete(
+                uri,   // Uri
+                null,  // selection
+                null   // selectionArgs
         );
     }
 
@@ -185,15 +219,16 @@ public class Project {
         mDescription = description;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return mCategory;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         mCategory = category;
     }
 
     public long getUpdatedAt() {
         return mUpdatedAt;
     }
+
 }

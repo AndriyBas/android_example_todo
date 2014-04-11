@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -165,9 +166,14 @@ public class ToDoDetailFragment extends Fragment {
 
     private boolean saveData() {
 
+        if (TextUtils.isEmpty(mEditTextSummary.getText())) {
+            return false;
+        }
+
         String category = (String) mSpinnerCategory.getSelectedItem();
         String summary = mEditTextSummary.getText().toString();
         String description = mEditTextDescription.getText().toString();
+
 
         mToDo.setSummary(summary);
         mToDo.setDescription(description);
