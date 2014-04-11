@@ -10,8 +10,8 @@ import com.parse.ParseUser;
  * @since 3/24/14 5:42 PM
  */
 
-@ParseClassName("Project")
-public class Project extends ParseObject {
+@ParseClassName("ParseProject")
+public class ParseProject extends ParseObject {
 
     public static final String KEY_USER = "user";
     public static final String KEY_LOCAL_ID = "localId";
@@ -19,10 +19,10 @@ public class Project extends ParseObject {
     public static final String KEY_DESCRIPTION = "description";
     public static final String KEY_CATEGORY = "category";
 
-    public Project() {
+    public ParseProject() {
     }
 
-    public Project(String summary, String description, Category category) {
+    public ParseProject(String summary, String description, Category category) {
         setSummary(summary);
         setDescription(description);
         setCategory(category);

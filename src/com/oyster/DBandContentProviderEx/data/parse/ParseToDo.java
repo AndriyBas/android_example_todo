@@ -10,8 +10,8 @@ import com.parse.ParseUser;
  * @since 3/24/14 5:42 PM
  */
 
-@ParseClassName("ToDo")
-public class ToDo extends ParseObject {
+@ParseClassName("ParseToDo")
+public class ParseToDo extends ParseObject {
 
     public static final String KEY_USER = "user";
     public static final String KEY_LOCAL_ID = "localId";
@@ -21,10 +21,10 @@ public class ToDo extends ParseObject {
     public static final String KEY_PROJECT_ID = "projectIdl";
     public static final String KEY_PROJECT = "project";
 
-    public ToDo() {
+    public ParseToDo() {
     }
 
-    public ToDo(String summary, String description, Category category) {
+    public ParseToDo(String summary, String description, Category category) {
         setSummary(summary);
         setDescription(description);
         setCategory(category);
@@ -46,8 +46,8 @@ public class ToDo extends ParseObject {
         return getLong(KEY_PROJECT_ID);
     }
 
-    public void setProject(Project project) {
-        put(KEY_PROJECT, project);
+    public void setProject(ParseProject parseProject) {
+        put(KEY_PROJECT, parseProject);
     }
 
     public ParseObject getProject() {

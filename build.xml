@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ToDoExample" default="help">
+<parseProject name="ToDoExample" default="help">
 
     <!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
@@ -19,7 +19,7 @@
          For other overridable properties, look at the beginning of the rules
          files in the SDK, at tools/ant/build.xml
 
-         Properties related to the SDK location or the project target should
+         Properties related to the SDK location or the parseProject target should
          be updated using the 'android' tool with the 'update' action.
 
          This file is an integral part of the build system for your
@@ -30,32 +30,32 @@
 
     <!-- if sdk.dir was not set from one of the property file, then
          get it from the ANDROID_HOME env var.
-         This must be done before we load project.properties since
+         This must be done before we load parseProject.properties since
          the proguard config can use sdk.dir -->
     <property environment="env"/>
     <condition property="sdk.dir" value="${env.ANDROID_HOME}">
         <isset property="env.ANDROID_HOME"/>
     </condition>
 
-    <!-- The project.properties file is created and updated by the 'android'
+    <!-- The parseProject.properties file is created and updated by the 'android'
          tool, as well as ADT.
 
-         This contains project specific properties such as project target, and library
+         This contains parseProject specific properties such as parseProject target, and library
          dependencies. Lower level build properties are stored in ant.properties
          (or in .classpath for Eclipse projects).
 
          This file is an integral part of the build system for your
          application and should be checked into Version Control Systems. -->
-    <loadproperties srcFile="project.properties"/>
+    <loadproperties srcFile="parseProject.properties"/>
 
     <!-- quick check on sdk.dir -->
     <fail
-            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
+            message="sdk.dir is missing. Make sure to generate local.properties using 'android update parseProject' or to inject it through the ANDROID_HOME environment variable."
             unless="sdk.dir"
             />
 
     <!--
-        Import per project custom build rules if present at the root of the project.
+        Import per parseProject custom build rules if present at the root of the parseProject.
         This is the place to put custom intermediary targets such as:
             -pre-build
             -pre-compile
@@ -84,9 +84,9 @@
          ****** IMPORTANT ******
          ***********************
          In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
-         in order to avoid having your file be overridden by tools such as "android update project"
+         in order to avoid having your file be overridden by tools such as "android update parseProject"
     -->
     <!-- version-tag: 1 -->
     <import file="${sdk.dir}/tools/ant/build.xml"/>
 
-</project>
+</parseProject>

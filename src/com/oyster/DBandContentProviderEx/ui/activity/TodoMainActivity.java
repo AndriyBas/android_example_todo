@@ -12,7 +12,7 @@ import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
-import com.oyster.DBandContentProviderEx.ToDoApplication;
+import com.oyster.DBandContentProviderEx.ToDoApp;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
 import com.oyster.DBandContentProviderEx.services.ToDoParseUploadService;
@@ -114,7 +114,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
                 // keep track of time user was last log in in order to effectively fetch data later
                 // from server's database
-                ToDoApplication.setLastUserSessionDate(System.currentTimeMillis());
+                ToDoApp.setLastUserSessionDate(System.currentTimeMillis());
 
                 ParseUser.logOut();
 
@@ -136,7 +136,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
 
         final View v = LayoutInflater.from(this).inflate(R.layout.dialog_new_project, null, false);
         builder.setView(v);
-        builder.setTitle("New Project");
+        builder.setTitle("New ParseProject");
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override

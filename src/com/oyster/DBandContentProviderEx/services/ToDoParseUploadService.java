@@ -7,10 +7,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.text.format.DateUtils;
 import android.util.Log;
-import com.oyster.DBandContentProviderEx.ToDoApplication;
+import com.oyster.DBandContentProviderEx.ToDoApp;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
-import com.oyster.DBandContentProviderEx.data.parse.ToDo;
+import com.oyster.DBandContentProviderEx.data.parse.ParseToDo;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.parse.*;
 
@@ -78,7 +78,7 @@ public class ToDoParseUploadService extends IntentService {
                 Log.i(TAG, "Started, time : " +
                         DateUtils.formatDateTime(
                                 getApplicationContext(),
-                                ToDoApplication.getLastServerSynchronizeDate(),
+                                ToDoApp.getLastServerSynchronizeDate(),
                                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME
                         ));
 
@@ -105,7 +105,7 @@ public class ToDoParseUploadService extends IntentService {
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);
 
-        String roleName = "todo_role_" + ToDoApplication.getCurrentUserId();
+        String roleName = "todo_role_" + ToDoApp.getCurrentUserId();
         ParseRole role = new ParseRole(roleName, acl);
         role.getUsers().add(ParseUser.getCurrentUser());
         role.saveInBackground();
@@ -115,7 +115,7 @@ public class ToDoParseUploadService extends IntentService {
         acl.setPublicReadAccess(true);
         acl.setPublicWriteAccess(true);
 
-        String roleName = "todo_role_" + ToDoApplication.getCurrentUserId();
+        String roleName = "todo_role_" + ToDoApp.getCurrentUserId();
         ParseRole role = new ParseRole(roleName, acl);
         role.getUsers().add(ParseUser.getCurrentUser());
         role.saveInBackground();
@@ -127,17 +127,17 @@ public class ToDoParseUploadService extends IntentService {
         ParseACL.setDefaultACL(parseACL, true);
 
 
-        ToDo toDo = new ToDo();
+        ParseToDo parseToDo = new ParseToDo();
 
 
-        toDo.setUser(ParseUser.getCurrentUser());
+        parseToDo.setUser(ParseUser.getCurrentUser());
 
 //        ParseACL parseACL = new ParseACL();
 //        parseACL.setRoleReadAccess(roleName, true);
 //        parseACL.setRoleWriteAccess(roleName, true);
-        toDo.setACL(parseACL);
+        parseToDo.setACL(parseACL);
 
-        fillBasicAndSaveToDo(toDo, cursor, toDoUri, true);
+        fillBasicAndSaveToDo(parseToDo, cursor, toDoUri, true);
 
 
     }
@@ -150,17 +150,17 @@ public class ToDoParseUploadService extends IntentService {
 
         Log.i(TAG, "start");
 
-        ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
+        ParseQuery<ParseToDo> toDoParseQuery = new ParseQuery<ParseToDo>("ParseToDo");
         toDoParseQuery.whereEqualTo("objectId",
                 cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_PARSE_ID)));
 
 
         try {
-            List<ToDo> toDos = toDoParseQuery.find();
-            if (toDos == null || toDos.size() < 1) {
+            List<ParseToDo> parseToDos = toDoParseQuery.find();
+            if (parseToDos == null || parseToDos.size() < 1) {
                 Log.e(TAG, "empty list returned from Parse");
             }
-            fillBasicAndSaveToDo(toDos.get(0), cursor, toDoUri, false);
+            fillBasicAndSaveToDo(parseToDos.get(0), cursor, toDoUri, false);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -189,21 +189,21 @@ public class ToDoParseUploadService extends IntentService {
      * fill current toDo_ with summary, description and category
      * and save it back in background
      *
-     * @param toDo   item to fill data with
+     * @param parseToDo   item to fill data with
      * @param cursor holds data to fill
      */
-    private void fillBasicAndSaveToDo(final ToDo toDo, final Cursor cursor, final Uri toDoUri, final boolean updateParseId) {
+    private void fillBasicAndSaveToDo(final ParseToDo parseToDo, final Cursor cursor, final Uri toDoUri, final boolean updateParseId) {
 
-        toDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
-        toDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));
-        toDo.setCategory(Category.valueOf(
+        parseToDo.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_SUMMARY)));
+        parseToDo.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(TodoTable.COLUMN_DESCRIPTION)));
+        parseToDo.setCategory(Category.valueOf(
                 cursor.getString(cursor.getColumnIndexOrThrow((TodoTable.COLUMN_CATEGORY)))));
 
-        toDo.getACL().setRoleReadAccess("__fuck_like_a_beast", true);
+        parseToDo.getACL().setRoleReadAccess("__fuck_like_a_beast", true);
 
         cursor.close();
 
-        toDo.saveEventually(new SaveCallback() {
+        parseToDo.saveEventually(new SaveCallback() {
             @Override
             public void done(ParseException e) {
                 if (e != null) {
@@ -213,16 +213,16 @@ public class ToDoParseUploadService extends IntentService {
                 }
 
                 if (updateParseId) {
-                    updateParseIdLocally(toDoUri, toDo);
+                    updateParseIdLocally(toDoUri, parseToDo);
                 }
             }
         });
     }
 
-    private void updateParseIdLocally(Uri toDoUri, ToDo toDo) {
+    private void updateParseIdLocally(Uri toDoUri, ParseToDo parseToDo) {
 
         ContentValues values = new ContentValues();
-        values.put(TodoTable.COLUMN_PARSE_ID, toDo.getObjectId());
+        values.put(TodoTable.COLUMN_PARSE_ID, parseToDo.getObjectId());
         getContentResolver().update(
                 toDoUri, // Uri
                 values,  // ContentValues
@@ -239,17 +239,17 @@ public class ToDoParseUploadService extends IntentService {
 
         Log.i(TAG, "start");
 
-        ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
+        ParseQuery<ParseToDo> toDoParseQuery = new ParseQuery<ParseToDo>("ParseToDo");
         toDoParseQuery.whereEqualTo("objectId", parseIdToDelete);
 
         try {
-            List<ToDo> toDos = toDoParseQuery.find();
+            List<ParseToDo> parseToDos = toDoParseQuery.find();
             // if no items found
-            if (toDos == null || toDos.size() < 1) {
+            if (parseToDos == null || parseToDos.size() < 1) {
                 Log.e(TAG, "empty list returned from Parse");
                 return;
             }
-            toDos.get(0).deleteEventually(new DeleteCallback() {
+            parseToDos.get(0).deleteEventually(new DeleteCallback() {
                 @Override
                 public void done(ParseException e) {
                     if (e != null) {
@@ -267,16 +267,16 @@ public class ToDoParseUploadService extends IntentService {
 
         Log.i(TAG, "started sync");
 
-        ParseQuery<ToDo> toDoParseQuery = new ParseQuery<ToDo>("ToDo");
-        toDoParseQuery.whereGreaterThanOrEqualTo("updatedAt", new Date(ToDoApplication.getLastServerSynchronizeDate()));
+        ParseQuery<ParseToDo> toDoParseQuery = new ParseQuery<ParseToDo>("ParseToDo");
+        toDoParseQuery.whereGreaterThanOrEqualTo("updatedAt", new Date(ToDoApp.getLastServerSynchronizeDate()));
 
         try {
-            List<ToDo> toDos = toDoParseQuery.find();
-            // no toDos found
-            if (toDos == null) {
+            List<ParseToDo> parseToDos = toDoParseQuery.find();
+            // no parseToDos found
+            if (parseToDos == null) {
                 return;
             }
-            updateAllItems(toDos);
+            updateAllItems(parseToDos);
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -284,15 +284,15 @@ public class ToDoParseUploadService extends IntentService {
 
     }
 
-    private void updateAllItems(List<ToDo> toDos) {
+    private void updateAllItems(List<ParseToDo> parseToDos) {
 
-        Log.i(TAG, "started update, size : " + toDos.size());
+        Log.i(TAG, "started update, size : " + parseToDos.size());
 
-        for (int i = 0; i < toDos.size(); i++) {
-            ToDo t = toDos.get(i);
+        for (int i = 0; i < parseToDos.size(); i++) {
+            ParseToDo t = parseToDos.get(i);
 
             Uri toDoUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI + "/"
-                    + ToDoApplication.getCurrentUserId() + "/parseId/" + t.getObjectId());
+                    + ToDoApp.getCurrentUserId() + "/parseId/" + t.getObjectId());
 
             ContentValues values = new ContentValues();
             values.put(TodoTable.COLUMN_SUMMARY, t.getSummary());
@@ -301,7 +301,7 @@ public class ToDoParseUploadService extends IntentService {
 
 
             // TODO
-//            values.put(TodoTable.COLUMN_USER_ID, ToDoApplication.getCurrentUserId());
+//            values.put(TodoTable.COLUMN_USER_ID, ToDoApp.getCurrentUserId());
 
             Cursor c = fetchCursor(toDoUri);
 
@@ -320,11 +320,11 @@ public class ToDoParseUploadService extends IntentService {
             c.close();
         }
 
-        ToDoApplication.setLastServerSynchronizeDate(System.currentTimeMillis());
+        ToDoApp.setLastServerSynchronizeDate(System.currentTimeMillis());
         Log.i(TAG, "finished, time : " +
                 DateUtils.formatDateTime(
                         getApplicationContext(),
-                        ToDoApplication.getLastServerSynchronizeDate(),
+                        ToDoApp.getLastServerSynchronizeDate(),
                         DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME
                 ));
     }

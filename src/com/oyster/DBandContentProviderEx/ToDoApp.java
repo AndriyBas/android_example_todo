@@ -2,11 +2,13 @@ package com.oyster.DBandContentProviderEx;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import com.oyster.DBandContentProviderEx.data.parse.Project;
-import com.oyster.DBandContentProviderEx.data.parse.ToDo;
+import com.oyster.DBandContentProviderEx.data.parse.ParseProject;
+import com.oyster.DBandContentProviderEx.data.parse.ParseToDo;
+import com.oyster.DBandContentProviderEx.utils.Utils;
 import com.parse.Parse;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,10 +17,10 @@ import java.util.Set;
  * @author bamboo
  * @since 3/30/14 12:56 PM
  */
-public class ToDoApplication extends Application {
+public class ToDoApp extends Application {
 
 
-    private static final String SHARED_PREFS_USER_SETTINGS = "com.oyster.ToDoApplication";
+    private static final String SHARED_PREFS_USER_SETTINGS = "com.oyster.ToDoApp";
 
     private static final String KEY_LAST_USER_SESSION_DATE = "last_user_session_date";
     private static final String KEY_LAST_SERVER_SYNCHRONIZE_DATE = "last_server_synchronize_date";
@@ -26,21 +28,25 @@ public class ToDoApplication extends Application {
 
     private static SharedPreferences mSharedPreferencesUserSettings;
 
-
     @Override
     public void onCreate() {
         super.onCreate();
 
+
         // Register _ToDo_ class to use with Parse functions
-        ParseObject.registerSubclass(ToDo.class);
-        ParseObject.registerSubclass(Project.class);
+        ParseObject.registerSubclass(ParseToDo.class);
+        ParseObject.registerSubclass(ParseProject.class);
 
         // initializing Parse account with App ID and Client ID
         Parse.initialize(this, ParseKeys.APPLICATION_ID,
                 ParseKeys.CLIENT_KEY);
 
+        JSONObject o = new JSONObject();
+
         // initialize SharedPreferences
         mSharedPreferencesUserSettings = getSharedPreferences(SHARED_PREFS_USER_SETTINGS, MODE_MULTI_PROCESS);
+
+        Utils.setAppContext(getApplicationContext());
     }
 
     public static String getCurrentUserId() {

@@ -19,7 +19,6 @@ public class TodoTable {
     public static final String COLUMN_PROJECT_ID = "todo_projectId";
     public static final String COLUMN_UPDATED_AT = "todo_updatedAt";
 
-
     public static final String[] AVAILABLE_COLUMNS = new String[]{
             COLUMN_ID,
             COLUMN_PARSE_ID,

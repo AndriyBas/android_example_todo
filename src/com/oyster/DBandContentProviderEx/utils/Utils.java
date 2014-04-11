@@ -16,6 +16,9 @@ public class Utils {
      * @param c Context of the caller
      * @return true - network is connected, false - else
      */
+
+    private static Context sAppContext;
+
     public static boolean isNetworkConnected(Context c) {
 
         ConnectivityManager connectivityManager = (ConnectivityManager)
@@ -29,4 +32,11 @@ public class Utils {
         return false;
     }
 
+    public static Context getAppContext() {
+        return sAppContext;
+    }
+
+    public static void setAppContext(Context appContext) {
+        sAppContext = appContext;
+    }
 }

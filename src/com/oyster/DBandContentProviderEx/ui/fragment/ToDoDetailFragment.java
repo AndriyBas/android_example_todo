@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
-import com.oyster.DBandContentProviderEx.data.parse.ToDo;
+import com.oyster.DBandContentProviderEx.data.parse.ParseToDo;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
  */
 public class ToDoDetailFragment extends Fragment {
 
-    private ToDo todo;
+    private ParseToDo mTodo;
 
     private Uri todoUri;
 
@@ -172,8 +172,8 @@ public class ToDoDetailFragment extends Fragment {
                     }
                 }
 
-                if (todo == null) {
-                    todo = new ToDo(
+                if (mTodo == null) {
+                    mTodo = new ParseToDo(
                             summary,
                             description,
                             Category.valueOf(category));
@@ -229,7 +229,7 @@ public class ToDoDetailFragment extends Fragment {
         if (TodoContentProvider.matchTODOS_PROJECT(todoUri)) {
 
 //            Uri currentUri = Uri.parse(TodoContentProvider.CONTENT_TODO_URI
-//                    + getArguments().getLo "/toDoId/" + ToDoApplication.getCurrentUserId());
+//                    + getArguments().getLo "/toDoId/" + ToDoApp.getCurrentUserId());
 
             todoUri = getActivity().getContentResolver().insert(todoUri, values);
 
@@ -266,7 +266,7 @@ public class ToDoDetailFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         mToDoChanged = false;
                         deleteData();
-                        Toast.makeText(getActivity(), "ToDo deleted ...", Toast.LENGTH_SHORT)
+                        Toast.makeText(getActivity(), "ParseToDo deleted ...", Toast.LENGTH_SHORT)
                                 .show();
                         getActivity().onBackPressed();
 //                        mOnSuicideListener.onFragmentSuicide();
@@ -300,7 +300,7 @@ public class ToDoDetailFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Toast.makeText(getActivity(), "ToDo was not saved ...", Toast.LENGTH_SHORT);
+                Toast.makeText(getActivity(), "ParseToDo was not saved ...", Toast.LENGTH_SHORT);
 //                mOnSuicideListener.onFragmentSuicide();
                 mToDoChanged = false;
                 getActivity().onBackPressed();
@@ -311,13 +311,13 @@ public class ToDoDetailFragment extends Fragment {
 
     private void saveAndExitIfNotEmptySummary() {
         if (saveData()) {
-            Toast.makeText(getActivity(), "ToDo saved ...", Toast.LENGTH_SHORT)
+            Toast.makeText(getActivity(), "ParseToDo saved ...", Toast.LENGTH_SHORT)
                     .show();
 //            mOnSuicideListener.onFragmentSuicide();
             mToDoChanged = false;
             getActivity().onBackPressed();
         } else {
-            Toast.makeText(getActivity(), "Give ToDo a summary ..", Toast.LENGTH_SHORT)
+            Toast.makeText(getActivity(), "Give ParseToDo a summary ..", Toast.LENGTH_SHORT)
                     .show();
         }
     }
