@@ -57,6 +57,7 @@
                   android:screenOrientation="portrait"
                 >
         </activity>
+        <activity android:name=".ui.activity.ToDoDetailActivity"/>
 
         <provider
                 android:authorities="com.oyster.DBandContentProviderEx"

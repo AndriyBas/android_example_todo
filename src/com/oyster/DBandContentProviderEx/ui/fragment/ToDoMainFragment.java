@@ -1,11 +1,11 @@
 package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -19,8 +19,11 @@ import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
+import com.oyster.DBandContentProviderEx.ui.activity.ToDoDetailActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
 import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
+
+import java.io.Serializable;
 
 /**
  * @author bamboo
@@ -33,8 +36,7 @@ public class ToDoMainFragment extends ListFragment
 
     private static final int MENU_DELETE_ID = Menu.FIRST + 1;
     private ToDoCursorAdapter mCursorAdapter;
-    private long mProjectId;
-
+    private static long mProjectId = -1;
 
     public final static String KEY_PROJECT_ID = "ToDoMAinFragment.projectId";
 
@@ -218,14 +220,28 @@ public class ToDoMainFragment extends ListFragment
         }
         toDo.setProjectId(getProjectId());
 
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
-                (ToDoDetailFragment.OnSuicideListener) getActivity());
-        transaction.replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
-                fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        Intent i = new Intent(getActivity(), ToDoDetailActivity.class);
+        i.putExtra(ToDoDetailActivity.KEY_CURSOR_ADAPTER, mCursorAdapter);
+        startActivity(i);
 
+       /* ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
+                (ToDoDetailFragment.OnSuicideListener) getActivity());
+        getFragmentManager()
+                .beginTransaction()
+
+                        // Replace the default fragment animations with animator resources representing
+                        // rotations when switching to the back of the card, as well as animator
+                        // resources representing rotations when flipping back to the front (e.g. when
+                        // the system Back button is pressed).
+                .setCustomAnimations(
+                        R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+
+                .replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
+                        fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT)
+                .addToBackStack(null)
+                .commit();
+*/
     }
 
     @Override
@@ -347,7 +363,7 @@ public class ToDoMainFragment extends ListFragment
         Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
     }
 
-    public long getProjectId() {
+    public static long getProjectId() {
         return mProjectId;
     }
 
@@ -370,7 +386,7 @@ public class ToDoMainFragment extends ListFragment
     /**
      * just nice CursorAdapter
      */
-    class ToDoCursorAdapter extends CursorAdapter {
+    public class ToDoCursorAdapter extends CursorAdapter implements Serializable {
 
         private LayoutInflater mLayoutInflater;
 

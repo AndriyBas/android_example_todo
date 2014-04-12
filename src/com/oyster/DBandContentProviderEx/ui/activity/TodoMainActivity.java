@@ -172,8 +172,8 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         });
 
         builder.show();
-
     }
+
 
     @Override
     public void onFragmentSuicide() {
