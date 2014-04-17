@@ -7,6 +7,7 @@ import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvide
 import com.oyster.DBandContentProviderEx.data.table.ProjectTable;
 import com.oyster.DBandContentProviderEx.utils.Utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @author bamboo
  * @since 4/11/14 5:11 PM
  */
-public class Project {
+public class Project implements Serializable {
 
     private long mId = -1;
     private String mSummary = "";

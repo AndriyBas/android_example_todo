@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
+
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.ToDoApp;
 import com.oyster.DBandContentProviderEx.data.Project;

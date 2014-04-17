@@ -35,7 +35,9 @@ public class ToDoMainFragment extends ListFragment
     public static int CURRENT_PROJECT_ID = -1;
 
     private static final int MENU_DELETE_ID = Menu.FIRST + 1;
-    private ToDoCursorAdapter mCursorAdapter;
+
+    transient private ToDoCursorAdapter mCursorAdapter;
+
     private static long mProjectId = -1;
 
     public final static String KEY_PROJECT_ID = "ToDoMAinFragment.projectId";
@@ -221,6 +223,7 @@ public class ToDoMainFragment extends ListFragment
         toDo.setProjectId(getProjectId());
 
         Intent i = new Intent(getActivity(), ToDoDetailActivity.class);
+
         i.putExtra(ToDoDetailActivity.KEY_CURSOR_ADAPTER, mCursorAdapter);
         startActivity(i);
 

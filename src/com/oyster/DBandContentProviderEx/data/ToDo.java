@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class ToDo implements Serializable {
 
+
     private long mId = -1;
     private long mProjectId = -1;
     private String mSummary = "";

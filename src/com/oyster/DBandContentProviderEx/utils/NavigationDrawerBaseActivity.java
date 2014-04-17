@@ -14,9 +14,6 @@ import com.oyster.DBandContentProviderEx.R;
  * @since 3/28/14 11:52 PM
  */
 
-
-// TODO Change the fucking fragment to support
-
 public class NavigationDrawerBaseActivity extends Activity {
 
     protected DrawerLayout mDrawerLayout;
