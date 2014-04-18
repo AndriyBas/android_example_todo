@@ -1,9 +1,9 @@
 package com.oyster.DBandContentProviderEx.utils;
 
-import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +14,7 @@ import com.oyster.DBandContentProviderEx.R;
  * @since 3/28/14 11:52 PM
  */
 
-public class NavigationDrawerBaseActivity extends Activity {
+public class NavigationDrawerBaseActivity extends FragmentActivity {
 
     protected DrawerLayout mDrawerLayout;
     protected ActionBarDrawerToggle mActionBarDrawerToggle;

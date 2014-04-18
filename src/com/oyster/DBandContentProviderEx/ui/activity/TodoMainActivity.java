@@ -1,16 +1,15 @@
 package com.oyster.DBandContentProviderEx.ui.activity;
 
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.*;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
-
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.ToDoApp;
 import com.oyster.DBandContentProviderEx.data.Project;
@@ -77,7 +76,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                FragmentManager fm = getFragmentManager();
+                FragmentManager fm = getSupportFragmentManager();
                 while (fm.popBackStackImmediate()) ;
 
                 fm.beginTransaction()
@@ -189,7 +188,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     @Override
     public void onBackPressed() {
 
-        FragmentManager fm = getFragmentManager();
+        FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentByTag(TAG_DETAIL_FRAGMENT);
 
         if (fragment != null && fragment instanceof ToDoDetailFragment) {

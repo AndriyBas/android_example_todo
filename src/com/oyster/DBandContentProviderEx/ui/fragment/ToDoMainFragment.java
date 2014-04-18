@@ -1,16 +1,16 @@
 package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -31,6 +31,8 @@ import java.io.Serializable;
  */
 public class ToDoMainFragment extends ListFragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    public static String TAG = "ToDoMainFragment";
 
     public static int CURRENT_PROJECT_ID = -1;
 
@@ -59,7 +61,7 @@ public class ToDoMainFragment extends ListFragment
         super.onCreate(savedInstanceState);
 
 
-        Log.i(getClass().getSimpleName(), " :  onCreate ");
+        Log.i(TAG, " :  onCreate ");
 
 
         setRetainInstance(true);
@@ -83,7 +85,7 @@ public class ToDoMainFragment extends ListFragment
         fillData();
 
 
-        Log.i(getClass().getSimpleName(), " :  onCreateView ");
+        Log.i(TAG, " :  onCreateView ");
 
 
         return v;
@@ -222,13 +224,22 @@ public class ToDoMainFragment extends ListFragment
         }
         toDo.setProjectId(getProjectId());
 
-        Intent i = new Intent(getActivity(), ToDoDetailActivity.class);
 
-        i.putExtra(ToDoDetailActivity.KEY_CURSOR_ADAPTER, mCursorAdapter);
-        startActivity(i);
+        Intent intent = new Intent(getActivity(), ToDoDetailActivity.class);
 
-       /* ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
+        long[] idArray = new long[mCursorAdapter.getCount()];
+
+        for (int i = 0; i < idArray.length; i++) {
+            idArray[i] = mCursorAdapter.getItemId(i);
+        }
+
+        intent.putExtra(ToDoDetailActivity.KEY_TODO_ID_LIST, idArray);
+        startActivity(intent);
+
+/*
+        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
                 (ToDoDetailFragment.OnSuicideListener) getActivity());
+
         getFragmentManager()
                 .beginTransaction()
 
@@ -236,15 +247,15 @@ public class ToDoMainFragment extends ListFragment
                         // rotations when switching to the back of the card, as well as animator
                         // resources representing rotations when flipping back to the front (e.g. when
                         // the system Back button is pressed).
-                .setCustomAnimations(
-                        R.animator.card_flip_right_in, R.animator.card_flip_right_out,
-                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+//                .setCustomAnimations(
+//                        R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+//                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)
 
                 .replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
                         fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT)
                 .addToBackStack(null)
-                .commit();
-*/
+                .commit();*/
+
     }
 
     @Override
@@ -305,19 +316,19 @@ public class ToDoMainFragment extends ListFragment
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i(getClass().getSimpleName(), " :  onViewCreated ");
+        Log.i(TAG, " :  onViewCreated ");
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.i(getClass().getSimpleName(), " :  onDestroyView ");
+        Log.i(TAG, " :  onDestroyView ");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.i(getClass().getSimpleName(), " :  onStart ");
+        Log.i(TAG, " :  onStart ");
     }
 
     @Override
@@ -327,43 +338,43 @@ public class ToDoMainFragment extends ListFragment
         ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
 
 
-        Log.i(getClass().getSimpleName(), " :  onResume ");
+        Log.i(TAG, " :  onResume ");
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.i(getClass().getSimpleName(), " :  onPause ");
+        Log.i(TAG, " :  onPause ");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.i(getClass().getSimpleName(), " :  onStop ");
+        Log.i(TAG, " :  onStop ");
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Log.i(getClass().getSimpleName(), " :  onAttach ");
+        Log.i(TAG, " :  onAttach ");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(getClass().getSimpleName(), " :  onDestroy ");
+        Log.i(TAG, " :  onDestroy ");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.i(getClass().getSimpleName(), " :  onDetach ");
+        Log.i(TAG, " :  onDetach ");
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i(getClass().getSimpleName(), " :  onActivityCreated ");
+        Log.i(TAG, " :  onActivityCreated ");
     }
 
     public static long getProjectId() {

@@ -1,13 +1,20 @@
 package com.oyster.DBandContentProviderEx.ui.activity;
 
+
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import com.google.common.primitives.Longs;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoDetailFragment;
 import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author bamboo
@@ -15,36 +22,39 @@ import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
  */
 public class ToDoDetailActivity extends FragmentActivity {
 
-    private ToDoMainFragment.ToDoCursorAdapter mCursorAdapter;
-
     private ViewPager mViewPager;
 
     private ToDoDetailPagerAdapter mPagerAdapter;
 
-
-    public static final String KEY_CURSOR_ADAPTER = "cursor_adapter";
+    public static final String KEY_TODO_ID_LIST = "todo_id_list";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_detail_view_pager);
 
-        ToDoMainFragment.ToDoCursorAdapter adapter = (ToDoMainFragment.ToDoCursorAdapter) getIntent().getSerializableExtra(KEY_CURSOR_ADAPTER);
-        if (savedInstanceState != null) {
-            adapter = (ToDoMainFragment.ToDoCursorAdapter) savedInstanceState.getSerializable(KEY_CURSOR_ADAPTER);
-        }
-        mCursorAdapter = adapter;
+        List<Long> idList = Longs.asList(getIntent().getLongArrayExtra(KEY_TODO_ID_LIST));
 
+       /* if (savedInstanceState != null && adapter == null) {
+            ToDoDetailPagerAdapter toDoCursorAdapter = (ToDoDetailPagerAdapter)
+                    savedInstanceState.getSerializable(KEY_TODO_ID_LIST);
+
+            if (toDoCursorAdapter != null) {
+                adapter = toDoCursorAdapter;
+            }
+        }
+
+        mPagerAdapter = adapter;*/
 
         mViewPager = (ViewPager) findViewById(R.id.toDoDetailViewPager);
-        mPagerAdapter = new ToDoDetailPagerAdapter(getFragmentManager());
+        mPagerAdapter = new ToDoDetailPagerAdapter(getSupportFragmentManager(), idList);
 
         mViewPager.setAdapter(mPagerAdapter);
     }
-
+/*
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putSerializable(KEY_CURSOR_ADAPTER, mCursorAdapter);
+        outState.putSerializable(KEY_TODO_ID_LIST, mPagerAdapter);
 
         super.onSaveInstanceState(outState);
 
@@ -53,13 +63,15 @@ public class ToDoDetailActivity extends FragmentActivity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
-        if (savedInstanceState != null) {
-            mCursorAdapter = (ToDoMainFragment.ToDoCursorAdapter) savedInstanceState
-                    .getSerializable(KEY_CURSOR_ADAPTER);
+        ToDoDetailPagerAdapter pagerAdapter = (ToDoDetailPagerAdapter)
+                savedInstanceState.getSerializable(KEY_TODO_ID_LIST);
+
+        if (pagerAdapter != null) {
+            mPagerAdapter = pagerAdapter;
         }
 
         super.onRestoreInstanceState(savedInstanceState);
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
@@ -74,27 +86,30 @@ public class ToDoDetailActivity extends FragmentActivity {
         }
     }
 
-    public class ToDoDetailPagerAdapter extends FragmentPagerAdapter {
+    public class ToDoDetailPagerAdapter extends FragmentPagerAdapter
+            implements Serializable {
 
+        List<Long> toDoIdList;
 
-        public ToDoDetailPagerAdapter(android.app.FragmentManager fm) {
+        public ToDoDetailPagerAdapter(FragmentManager fm, List<Long> list) {
             super(fm);
+            toDoIdList = list;
         }
 
         @Override
-        public android.app.Fragment getItem(int i) {
+        public Fragment getItem(int i) {
 
             return ToDoDetailFragment.newInstance(
                     ToDo.getById(
                             ToDoMainFragment.getProjectId(),
-                            mCursorAdapter.getItemId(i)),
+                            toDoIdList.get(i)),
                     null
             );
         }
 
         @Override
         public int getCount() {
-            return mCursorAdapter.getCount();
+            return toDoIdList.size();
         }
     }
 
