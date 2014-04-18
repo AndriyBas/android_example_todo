@@ -1,7 +1,6 @@
 package com.oyster.DBandContentProviderEx.ui.fragment;
 
 import android.app.AlertDialog;
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.Category;
 import com.oyster.DBandContentProviderEx.data.ToDo;
+import com.oyster.DBandContentProviderEx.utils.DebugLoggingSupportFragment;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * @author bamboo
  * @since 3/24/14 9:53 PM
  */
-public class ToDoDetailFragment extends Fragment {
+public class ToDoDetailFragment extends DebugLoggingSupportFragment {
 
     private ToDo mToDo;
 
@@ -86,6 +86,8 @@ public class ToDoDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+
         View v = inflater.inflate(R.layout.todo_detail_layout, container, false);
 
         init(v);
@@ -120,7 +122,13 @@ public class ToDoDetailFragment extends Fragment {
         mSpinnerCategory.setAdapter(adapter);
 
         getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActivity().getActionBar().setTitle(R.string.action_bar_title_detail_fragment);
+
+
+//        if(mToDo != null) {
+//            getActivity().getActionBar().setTitle(mToDo.getSummary());
+//        }   else {
+//            getActivity().getActionBar().setTitle(R.string.action_bar_title_detail_fragment);
+//        }
 
     }
 
@@ -142,6 +150,7 @@ public class ToDoDetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
         mEditTextSummary.addTextChangedListener(mTextWatcher);
         mEditTextDescription.addTextChangedListener(mTextWatcher);
     }

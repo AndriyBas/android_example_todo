@@ -22,7 +22,6 @@ import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvide
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
 import com.oyster.DBandContentProviderEx.ui.activity.ToDoDetailActivity;
 import com.oyster.DBandContentProviderEx.ui.activity.TodoMainActivity;
-import com.oyster.DBandContentProviderEx.utils.NavigationDrawerBaseActivity;
 
 import java.io.Serializable;
 
@@ -222,13 +221,7 @@ public class ToDoMainFragment extends ListFragment
 
         Intent intent = new Intent(getActivity(), ToDoDetailActivity.class);
 
-        long[] idArray = new long[mCursorAdapter.getCount()];
-
-        for (int i = 0; i < idArray.length; i++) {
-            idArray[i] = mCursorAdapter.getItemId(i);
-        }
-
-        intent.putExtra(ToDoDetailActivity.KEY_TODO_ID_LIST, idArray);
+        intent.putExtra(ToDoDetailActivity.KEY_PROJECT_ID, getProjectId());
         intent.putExtra(ToDoDetailActivity.KEY_TODO_POSITION_SELECTED, position);
 
         startActivity(intent);

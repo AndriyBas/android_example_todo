@@ -1,10 +1,10 @@
 package com.oyster.DBandContentProviderEx.utils;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.*;
 
@@ -12,13 +12,14 @@ import android.view.*;
  * @author bamboo
  * @since 4/1/14 3:03 PM
  */
-public abstract class DebugLoggingFragment extends Fragment {
+public abstract class DebugLoggingSupportFragment extends Fragment {
 
     public boolean mDebugMode = true;
 
     private void log(String s) {
         if (mDebugMode) {
-            Log.i(getClass().getSimpleName(), s);
+            Log.i("Debug ololo : ", s);
+
         }
     }
 
