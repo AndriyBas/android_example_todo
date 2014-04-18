@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
 
+<LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/nowCardStyle"
         android:minHeight="100dp"
+        android:descendantFocusability="blocksDescendants"
         >
 
     <ImageView
-            android:id="@+id/img_photo"
+            android:id="@+id/project_row_img_photo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/hello_world"
@@ -19,11 +20,13 @@
             android:src="@android:drawable/sym_action_call"
             />
 
+
     <LinearLayout
             android:layout_weight="3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+
             >
 
         <TextView
@@ -32,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18dp"
-                android:text="Company Name"
+                android:text="Project Name"
                 android:textStyle="bold"
                 android:padding="2dp"
                 android:layout_marginBottom="3dp"
@@ -49,4 +52,49 @@
                 />
     </LinearLayout>
 
+    <ImageButton
+            android:id="@+id/project_row_img_edit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/hello_world"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_menu_edit"
+            android:focusableInTouchMode="true"
+
+            style="?android:attr/borderlessButtonStyle"
+            />
+
+    <!--
+        <ImageView
+                android:id="@+id/project_row_img_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@android:drawable/sym_action_call"
+                android:focusable="false"
+                />
+    -->
+
+    <!--<ImageView
+
+            android:minHeight="50dp"
+            android:id="@+id/project_row_edit_button"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_edit"
+            />-->
+
 </LinearLayout>
+        <!--
+            <ImageButton
+
+                    android:focusable="false"
+                    android:id="@+id/project_row_edit_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignBottom="@id/project_row_summary_main_layout"
+                    />-->
+

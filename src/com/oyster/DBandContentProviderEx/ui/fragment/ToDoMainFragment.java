@@ -16,6 +16,7 @@ import android.view.*;
 import android.widget.*;
 import com.oyster.DBandContentProviderEx.R;
 import com.oyster.DBandContentProviderEx.data.Category;
+import com.oyster.DBandContentProviderEx.data.Project;
 import com.oyster.DBandContentProviderEx.data.ToDo;
 import com.oyster.DBandContentProviderEx.data.contentprovider.TodoContentProvider;
 import com.oyster.DBandContentProviderEx.data.table.TodoTable;
@@ -41,6 +42,7 @@ public class ToDoMainFragment extends ListFragment
     transient private ToDoCursorAdapter mCursorAdapter;
 
     private static long mProjectId = -1;
+
 
     public final static String KEY_PROJECT_ID = "ToDoMAinFragment.projectId";
 
@@ -94,7 +96,6 @@ public class ToDoMainFragment extends ListFragment
     private void init() {
 
 //        getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-        getActivity().getActionBar().setTitle(R.string.action_bar_title_main_fragment);
 
 
     }
@@ -198,7 +199,7 @@ public class ToDoMainFragment extends ListFragment
 
             case R.id.menu_main_new_toDo:
 
-                createToDo(null);
+                createToDo();
                 return true;
 
             case R.id.menu_main_sync:
@@ -217,13 +218,7 @@ public class ToDoMainFragment extends ListFragment
     }
 
 
-    public void createToDo(ToDo toDo) {
-
-        if (toDo == null) {
-            toDo = new ToDo();
-        }
-        toDo.setProjectId(getProjectId());
-
+    public void showToDoInNewActivity(int position) {
 
         Intent intent = new Intent(getActivity(), ToDoDetailActivity.class);
 
@@ -234,6 +229,8 @@ public class ToDoMainFragment extends ListFragment
         }
 
         intent.putExtra(ToDoDetailActivity.KEY_TODO_ID_LIST, idArray);
+        intent.putExtra(ToDoDetailActivity.KEY_TODO_POSITION_SELECTED, position);
+
         startActivity(intent);
 
 /*
@@ -258,11 +255,36 @@ public class ToDoMainFragment extends ListFragment
 
     }
 
+    private void createToDo() {
+        ToDo toDo = new ToDo();
+        toDo.setProjectId(getProjectId());
+
+        ToDoDetailFragment fragment = ToDoDetailFragment.newInstance(toDo,
+                (ToDoDetailFragment.OnSuicideListener) getActivity());
+
+        getFragmentManager()
+                .beginTransaction()
+
+                        // Replace the default fragment animations with animator resources representing
+                        // rotations when switching to the back of the card, as well as animator
+                        // resources representing rotations when flipping back to the front (e.g. when
+                        // the system Back button is pressed).
+//                .setCustomAnimations(
+//                        R.animator.card_flip_right_in, R.animator.card_flip_right_out,
+//                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)
+
+                .replace(((TodoMainActivity) getActivity()).getFragmentContainerId(),
+                        fragment, TodoMainActivity.TAG_DETAIL_FRAGMENT)
+                .addToBackStack(null)
+                .commit();
+
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        createToDo(ToDo.getById(getProjectId(), id));
+        showToDoInNewActivity(position);
     }
 
 
@@ -335,8 +357,10 @@ public class ToDoMainFragment extends ListFragment
     public void onResume() {
         super.onResume();
 
-        ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
+//        ((NavigationDrawerBaseActivity) getActivity()).closeAllDrawers();
 
+        String name = Project.getProjectById(getProjectId()).getSummary();
+        getActivity().getActionBar().setTitle("Project : " + name);
 
         Log.i(TAG, " :  onResume ");
     }

@@ -4,5 +4,6 @@
 
     <integer name="card_flip_time_full">300</integer>
     <integer name="card_flip_time_half">150</integer>
+    <integer name="project_image_edit_btn">47</integer>
 
 </resources>

@@ -20,6 +20,7 @@ import java.util.List;
  * @author bamboo
  * @since 4/12/14 8:13 AM
  */
+
 public class ToDoDetailActivity extends FragmentActivity {
 
     private ViewPager mViewPager;
@@ -27,52 +28,24 @@ public class ToDoDetailActivity extends FragmentActivity {
     private ToDoDetailPagerAdapter mPagerAdapter;
 
     public static final String KEY_TODO_ID_LIST = "todo_id_list";
+    public static final String KEY_TODO_POSITION_SELECTED = "todo_id_selected";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_detail_view_pager);
 
         List<Long> idList = Longs.asList(getIntent().getLongArrayExtra(KEY_TODO_ID_LIST));
-
-       /* if (savedInstanceState != null && adapter == null) {
-            ToDoDetailPagerAdapter toDoCursorAdapter = (ToDoDetailPagerAdapter)
-                    savedInstanceState.getSerializable(KEY_TODO_ID_LIST);
-
-            if (toDoCursorAdapter != null) {
-                adapter = toDoCursorAdapter;
-            }
-        }
-
-        mPagerAdapter = adapter;*/
+        int positionSelected = getIntent().getIntExtra(KEY_TODO_POSITION_SELECTED, 0);
 
         mViewPager = (ViewPager) findViewById(R.id.toDoDetailViewPager);
         mPagerAdapter = new ToDoDetailPagerAdapter(getSupportFragmentManager(), idList);
 
         mViewPager.setAdapter(mPagerAdapter);
-    }
-/*
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putSerializable(KEY_TODO_ID_LIST, mPagerAdapter);
-
-        super.onSaveInstanceState(outState);
-
+        mViewPager.setCurrentItem(positionSelected);
     }
 
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-
-        ToDoDetailPagerAdapter pagerAdapter = (ToDoDetailPagerAdapter)
-                savedInstanceState.getSerializable(KEY_TODO_ID_LIST);
-
-        if (pagerAdapter != null) {
-            mPagerAdapter = pagerAdapter;
-        }
-
-        super.onRestoreInstanceState(savedInstanceState);
-    }*/
-
+ /*
     @Override
     public void onBackPressed() {
         int currentItem = mViewPager.getCurrentItem();
@@ -85,6 +58,7 @@ public class ToDoDetailActivity extends FragmentActivity {
             mViewPager.setCurrentItem(currentItem - 1);
         }
     }
+    */
 
     public class ToDoDetailPagerAdapter extends FragmentPagerAdapter
             implements Serializable {

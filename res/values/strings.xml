@@ -27,4 +27,6 @@
     <string name="menu_main_new_project">New Project</string>
     <string name="dialog_prompt_project_summary">name or summary</string>
     <string name="dialog_prompt_progect_description">description</string>
+    <string name="navigation_drawer_action_bar_open_projects">Your projects</string>
+    <string name="navigation_drawer_action_bar_close_toDoApp">ToDo Manager</string>
 </resources>

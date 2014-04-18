@@ -43,7 +43,6 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         init();
 
         // upload all projects
@@ -76,20 +75,27 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                FragmentManager fm = getSupportFragmentManager();
-                while (fm.popBackStackImmediate()) ;
-
-                fm.beginTransaction()
-
-                        .replace(getFragmentContainerId(), ToDoMainFragment.newInstance(id), TAG_DETAIL_FRAGMENT)
-                        .commit();
-
-                closeAllDrawers();
+                onProjectClicked(position, id);
             }
         });
 
         mNavigationDrawerListView.callOnClick();
 
+    }
+
+    private void onProjectClicked(int position, long id) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        while (fm.popBackStackImmediate()) ;
+
+        fm.beginTransaction()
+
+                .replace(getFragmentContainerId(), ToDoMainFragment.newInstance(id), TAG_DETAIL_FRAGMENT)
+                .commit();
+
+        closeAllDrawers();
+
+        // set the title to the name of the project
     }
 
     @Override
@@ -105,7 +111,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         switch (item.getItemId()) {
             case R.id.menu_main_new_project:
 
-                showNewProjectDialog();
+                showNewProjectDialog(null);
                 return true;
 
 
@@ -129,32 +135,57 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
         }
     }
 
-    private void showNewProjectDialog() {
+    private void showNewProjectDialog(final Project p) {
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         final View v = LayoutInflater.from(this).inflate(R.layout.dialog_new_project, null, false);
-        builder.setView(v);
-        builder.setTitle("New ParseProject");
 
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        final TextView textViewSummary = (TextView) v.findViewById(R.id.dialog_new_project_summary);
+        final TextView textViewDescription = (TextView) v.findViewById(R.id.dialog_new_project_desc);
+
+        // populate fields if project was clicked
+        if (p != null) {
+            textViewSummary.setText(p.getSummary());
+            textViewDescription.setText(p.getDescription());
+            builder.setTitle("Project : " + p.getSummary());
+        } else {
+            builder.setTitle("New Parse Project");
+        }
+        builder.setView(v);
+
+
+        builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+
+                if (p != null) {
+                    Toast.makeText(TodoMainActivity.this, "Project : " + p.getSummary() + " deleted !", Toast.LENGTH_SHORT)
+                            .show();
+//                    p.delete();
+                }
 
             }
         });
 
-        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
             @SuppressWarnings("ConstantConditions")
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
 
-                String summary = ((TextView) v.findViewById(R.id.dialog_new_project_summary))
-                        .getText().toString();
+                String summary = textViewSummary.getText().toString();
 
-                String desc = ((TextView) v.findViewById(R.id.dialog_new_project_desc))
-                        .getText().toString();
+                String desc = textViewDescription.getText().toString();
 
                 if (TextUtils.isEmpty(summary)) {
                     Toast.makeText(getApplicationContext(), "give project a summary", Toast.LENGTH_LONG)
@@ -162,11 +193,15 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                     return;
                 }
 
-                Project p = new Project();
-                p.setSummary(summary);
-                p.setDescription(desc);
+                Project proj = p;
 
-                p.save();
+                if (proj == null) {
+                    proj = new Project();
+                }
+                proj.setSummary(summary);
+                proj.setDescription(desc);
+
+                proj.save();
 
             }
         });
@@ -236,7 +271,26 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         assert mProjectCursorAdapter != null;
+
         mProjectCursorAdapter.swapCursor(data);
+
+        setListView();
+    }
+
+    private void setListView() {
+
+
+        if (mNavigationDrawerListView.getCount() == 0) {
+            Project p = new Project();
+            p.setSummary("Default Project");
+            p.setDescription("Auto generated ");
+            p.setCategory("Default");
+            p.save();
+        }
+
+        onProjectClicked(0, mNavigationDrawerListView.getItemIdAtPosition(0));
+        mNavigationDrawerListView.setSelection(0);
+
     }
 
     @Override
@@ -276,6 +330,17 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                     (TextView) v.findViewById(R.id.project_row_desc)
             );
 
+            ImageButton imageButton = (ImageButton) v.findViewById(R.id.project_row_img_edit);
+            assert imageButton != null;
+
+            long projectId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(ProjectTable.COLUMN_ID));
+
+            // the tag must be unique so it has to be created in resources files to guarantee uniqueness
+            imageButton.setTag(R.integer.project_image_edit_btn, projectId);
+
+            imageButton.setOnClickListener(mProjectEditOnClickListener);
+
             v.setTag(holder);
 
             return v;
@@ -292,8 +357,20 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
             holder.mTextViewDesc.setText(cursor.getString(
                     cursor.getColumnIndexOrThrow(ProjectTable.COLUMN_DESCRIPTION)));
         }
-
-
     }
+
+    private final View.OnClickListener mProjectEditOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            long id = (long) v.getTag(R.integer.project_image_edit_btn);
+
+            showNewProjectDialog(Project.getProjectById(id));
+//            Toast.makeText(TodoMainActivity.this, "Project : " + id.toString(), Toast.LENGTH_SHORT)
+//                    .show();
+
+
+        }
+    };
+
 
 }

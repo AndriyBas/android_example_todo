@@ -111,7 +111,7 @@ public class TodoContentProvider extends ContentProvider {
                 // search in ProjectTable
                 sqLiteQueryBuilder.setTables(ProjectTable.TABLE_NAME);
 
-                // TODO need to add some logic so that current user have acess only to it's own projects
+                // TODO need to add some logic so that current user have access only to it's own projects
 
                 break;
 
@@ -124,6 +124,9 @@ public class TodoContentProvider extends ContentProvider {
 
                 sqLiteQueryBuilder.appendWhere(ProjectTable.COLUMN_ID + "="
                         + uri.getLastPathSegment());
+
+                // TODO need to add some logic so that current user have access only to it's own projects
+
                 break;
 
             default:

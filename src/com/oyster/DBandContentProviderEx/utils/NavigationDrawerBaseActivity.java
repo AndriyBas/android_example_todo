@@ -8,6 +8,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.MenuItem;
 import android.view.View;
 import com.oyster.DBandContentProviderEx.R;
+import com.oyster.DBandContentProviderEx.data.Project;
+import com.oyster.DBandContentProviderEx.ui.fragment.ToDoMainFragment;
 
 /**
  * @author bamboo
@@ -18,6 +20,8 @@ public class NavigationDrawerBaseActivity extends FragmentActivity {
 
     protected DrawerLayout mDrawerLayout;
     protected ActionBarDrawerToggle mActionBarDrawerToggle;
+
+//    protected String lastTitle = null;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,11 +45,16 @@ public class NavigationDrawerBaseActivity extends FragmentActivity {
                 R.string.navigation_drawer_close_drawer_cont_desc /* "close drawer" description */
         ) {
 
+
             /** Called when a drawer has settled in a completely closed state. */
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getActionBar().setTitle(R.string.navigation_drawer_action_bar_open_drawer);
+                // save the previous title on ActionBar
+
+//                lastTitle = getActionBar().getTitle().toString();
+
+                getActionBar().setTitle(R.string.navigation_drawer_action_bar_open_projects);
                 invalidateOptionsMenu();
             }
 
@@ -53,7 +62,16 @@ public class NavigationDrawerBaseActivity extends FragmentActivity {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getActionBar().setTitle(R.string.navigation_drawer_action_bar_close_drawer);
+
+
+                if (ToDoMainFragment.getProjectId() != -1) {
+                    String projectName = Project.getProjectById(ToDoMainFragment.getProjectId()).getSummary();
+                    getActionBar().setTitle("Project : " + projectName);
+                }
+
+//                if (lastTitle != null) {
+//                    getActionBar().setTitle(lastTitle);
+//                }
                 invalidateOptionsMenu();
             }
         };
