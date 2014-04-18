@@ -163,7 +163,7 @@ public class TodoMainActivity extends NavigationDrawerBaseActivity
                 if (p != null) {
                     Toast.makeText(TodoMainActivity.this, "Project : " + p.getSummary() + " deleted !", Toast.LENGTH_SHORT)
                             .show();
-//                    p.delete();
+                    p.delete();
                 }
 
             }

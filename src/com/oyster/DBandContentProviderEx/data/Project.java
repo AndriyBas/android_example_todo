@@ -182,6 +182,12 @@ public class Project implements Serializable {
             return;
         }
 
+        List<ToDo> toDos = ToDo.getByProjectId(getId());
+
+        for (ToDo t : toDos) {
+            t.delete();
+        }
+
         Uri uri = Uri.parse(TodoContentProvider.CONTENT_PROJECT_URI + "/" + getId());
 
         Utils.getAppContext().getContentResolver().delete(

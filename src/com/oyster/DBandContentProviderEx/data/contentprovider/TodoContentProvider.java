@@ -236,7 +236,13 @@ public class TodoContentProvider extends ContentProvider {
                 break;
 
             // this better not be called
-//            case PROJECTS_projectId:
+            case PROJECTS_projectId:
+
+                String projectId = uri.getLastPathSegment();
+
+                rowsDeleted = sqLiteDatabase.delete(ProjectTable.TABLE_NAME,
+                        ProjectTable.COLUMN_ID + "=" + projectId, null);
+
 //                String userId = uri.getLastPathSegment();
 //                if (TextUtils.isEmpty(selection)) {
 //                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
@@ -245,7 +251,8 @@ public class TodoContentProvider extends ContentProvider {
 //                    rowsDeleted = sqLiteDatabase.delete(TodoTable.TABLE_NAME,
 //                            selection, selectionArgs);
 //                }
-//                break;
+                break;
+
 
             default:
                 throwEx(uri);
